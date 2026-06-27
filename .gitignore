@@ -1,6 +1,7 @@
 .DS_Store
 *.pem
 /build
+.wrangler
 /.svelte-kit
 /package
 .env
