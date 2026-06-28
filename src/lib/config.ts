@@ -14,8 +14,12 @@ export const WEEK_TABS: string[] = [
   "Week 7",
 ];
 
+// Set to a tab name to force it as "upcoming" (unplayed matchups).
+// Set to null to auto-detect from the last week in WEEK_TABS.
 export const UPCOMING_TAB: string | null = "Week 8";
 
+// 0-indexed column in SUMMARY_TAB where canonical team names live.
+// Confirmed from actual sheet: col0=blank, col1=RANKING, col2=blank, col3=TEAM
 export const RANKINGS_NAME_COL = 3;
 export const RANKINGS_RANK_COL = 1;
 

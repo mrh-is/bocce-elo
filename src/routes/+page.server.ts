@@ -23,6 +23,7 @@ import type {
   LeaderboardEntry,
   UpcomingGame,
   PageData,
+  OfficialRankings,
 } from "$lib/types.js";
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
@@ -48,7 +49,7 @@ export async function load(): Promise<PageData> {
     );
   }
 
-  let officialRankings: Record<string, number> = {};
+  let officialRankings: OfficialRankings = {};
   try {
     officialRankings = await getOfficialRankings(
       PUBLIC_SHEET_ID,
