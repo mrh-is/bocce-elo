@@ -147,7 +147,9 @@ async function resolveUpcoming(
 
   for (let i = weekRowsCache.length - 1; i >= 0; i--) {
     const matchups = toMatchups(weekRowsCache[i].rows);
-    if (matchups.length > 0) { return matchups; }
+    if (matchups.length > 0) {
+      return matchups;
+    }
   }
   return [];
 }
@@ -159,8 +161,12 @@ function buildUpcomingIndex(
   for (const m of upcomingMatches) {
     const kA = normalize(m.teamA);
     const kB = normalize(m.teamB);
-    if (!upcomingByTeam[kA]) { upcomingByTeam[kA] = []; }
-    if (!upcomingByTeam[kB]) { upcomingByTeam[kB] = []; }
+    if (!upcomingByTeam[kA]) {
+      upcomingByTeam[kA] = [];
+    }
+    if (!upcomingByTeam[kB]) {
+      upcomingByTeam[kB] = [];
+    }
     upcomingByTeam[kA].push({
       opponent: m.teamB,
       prob: m.probA,
@@ -208,15 +214,23 @@ function buildLeaderboard(
       };
     })
     .sort((a, b) => {
-      if (a.officialRank === null && b.officialRank === null) { return 0; }
-      if (a.officialRank === null) { return 1; }
-      if (b.officialRank === null) { return -1; }
+      if (a.officialRank === null && b.officialRank === null) {
+        return 0;
+      }
+      if (a.officialRank === null) {
+        return 1;
+      }
+      if (b.officialRank === null) {
+        return -1;
+      }
       return a.officialRank - b.officialRank;
     });
 }
 
 export async function load(): Promise<PageData> {
-  if (cached && Date.now() - cachedAt < CACHE_TTL_MS) { return cached; }
+  if (cached && Date.now() - cachedAt < CACHE_TTL_MS) {
+    return cached;
+  }
 
   const { canonicalNames, officialRankings } = await fetchLeagueData(
     PUBLIC_SHEET_ID,
