@@ -430,6 +430,7 @@
     .table-wrap {
       flex: none;
       overflow-y: visible;
+      overflow-x: auto;
     }
 
     .this-wk {
