@@ -1,0 +1,35 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #0b0e0b;
+  color: #f0ece4;
+  font-family: "Inter", system-ui, sans-serif;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.layout {
+  height: 100dvh;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 600px) {
+  body {
+    height: auto;
+    overflow: auto;
+  }
+
+  .layout {
+    height: auto;
+    padding-bottom: 2rem;
+  }
+}
