@@ -57,9 +57,9 @@ describe('processMatches', () => {
 			{ teamA: 'Beta', teamB: 'Gamma', scoreA: 21, scoreB: 10, forfeitA: false, forfeitB: false },
 		];
 		const { records } = processMatches(matches);
-		expect(records['Alpha']).toEqual({ wins: 1, losses: 0, pointsFor: 21, pointsAgainst: 14 });
-		expect(records['Beta']).toEqual({ wins: 1, losses: 1, pointsFor: 35, pointsAgainst: 31 });
-		expect(records['Gamma']).toEqual({ wins: 0, losses: 1, pointsFor: 10, pointsAgainst: 21 });
+		expect(records['Alpha']).toEqual({ wins: 1, losses: 0, ties: 0, pointsFor: 21, pointsAgainst: 14 });
+		expect(records['Beta']).toEqual({ wins: 1, losses: 1, ties: 0, pointsFor: 35, pointsAgainst: 31 });
+		expect(records['Gamma']).toEqual({ wins: 0, losses: 1, ties: 0, pointsFor: 10, pointsAgainst: 21 });
 	});
 
 	it('handles forfeit: winner gets win, no points added to differential', () => {
