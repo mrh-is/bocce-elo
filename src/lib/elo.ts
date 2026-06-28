@@ -40,6 +40,74 @@ function initTeam(
   }
 }
 
+function trackWeekAppearance(
+  weekAppearances: Record<number, Record<string, number>>,
+  weekIndex: number,
+  team: string,
+): void {
+  if (!weekAppearances[weekIndex]) {
+    weekAppearances[weekIndex] = {};
+  }
+  weekAppearances[weekIndex][team] =
+    (weekAppearances[weekIndex][team] ?? 0) + 1;
+  if (weekAppearances[weekIndex][team] > 2) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[elo] ${team} appears more than 2 times in week ${weekIndex}`,
+    );
+  }
+}
+
+function resolveMatchOutcome(
+  match: Match,
+  records: Records,
+): { actualA: number; actualB: number; mult: number } {
+  const { teamA, teamB, scoreA, scoreB, forfeitA, forfeitB } = match;
+
+  if (forfeitA) {
+    records[teamA].losses++;
+    records[teamB].wins++;
+    return { actualA: 0, actualB: 1, mult: 1.0 };
+  }
+
+  if (forfeitB) {
+    records[teamA].wins++;
+    records[teamB].losses++;
+    return { actualA: 1, actualB: 0, mult: 1.0 };
+  }
+
+  if (scoreA === scoreB) {
+    records[teamA].ties++;
+    records[teamB].ties++;
+    records[teamA].pointsFor += scoreA!;
+    records[teamA].pointsAgainst += scoreB!;
+    records[teamB].pointsFor += scoreB!;
+    records[teamB].pointsAgainst += scoreA!;
+    return { actualA: 0.5, actualB: 0.5, mult: 1.0 };
+  }
+
+  if (scoreA! > scoreB!) {
+    records[teamA].wins++;
+    records[teamB].losses++;
+  } else {
+    records[teamA].losses++;
+    records[teamB].wins++;
+  }
+  records[teamA].pointsFor += scoreA!;
+  records[teamA].pointsAgainst += scoreB!;
+  records[teamB].pointsFor += scoreB!;
+  records[teamB].pointsAgainst += scoreA!;
+
+  return {
+    actualA: scoreA! > scoreB! ? 1 : 0,
+    actualB: scoreB! > scoreA! ? 1 : 0,
+    mult: marginMultiplier(
+      Math.max(scoreA!, scoreB!),
+      Math.min(scoreA!, scoreB!),
+    ),
+  };
+}
+
 export function processMatches(matches: Match[]): ProcessMatchesResult {
   const ratings: Ratings = {};
   const records: Records = {};
@@ -47,32 +115,14 @@ export function processMatches(matches: Match[]): ProcessMatchesResult {
   const weekAppearances: Record<number, Record<string, number>> = {};
 
   for (const match of matches) {
-    const { teamA, teamB, scoreA, scoreB, forfeitA, forfeitB, weekIndex } =
-      match;
+    const { teamA, teamB, weekIndex } = match;
 
     initTeam(ratings, records, weeklyRatings, teamA);
     initTeam(ratings, records, weeklyRatings, teamB);
 
     if (weekIndex !== undefined) {
-      if (!weekAppearances[weekIndex]) {
-        weekAppearances[weekIndex] = {};
-      }
-      weekAppearances[weekIndex][teamA] =
-        (weekAppearances[weekIndex][teamA] ?? 0) + 1;
-      weekAppearances[weekIndex][teamB] =
-        (weekAppearances[weekIndex][teamB] ?? 0) + 1;
-      if (weekAppearances[weekIndex][teamA] > 2) {
-        // eslint-disable-next-line no-console
-        console.warn(
-          `[elo] ${teamA} appears more than 2 times in week ${weekIndex}`,
-        );
-      }
-      if (weekAppearances[weekIndex][teamB] > 2) {
-        // eslint-disable-next-line no-console
-        console.warn(
-          `[elo] ${teamB} appears more than 2 times in week ${weekIndex}`,
-        );
-      }
+      trackWeekAppearance(weekAppearances, weekIndex, teamA);
+      trackWeekAppearance(weekAppearances, weekIndex, teamB);
     }
 
     const rA = ratings[teamA];
@@ -80,52 +130,7 @@ export function processMatches(matches: Match[]): ProcessMatchesResult {
     const eA = expectedScore(rA, rB);
     const eB = 1 - eA;
 
-    let actualA: number, actualB: number, mult: number;
-
-    if (forfeitA) {
-      actualA = 0;
-      actualB = 1;
-      mult = 1.0;
-      records[teamA].losses++;
-      records[teamB].wins++;
-    } else if (forfeitB) {
-      actualA = 1;
-      actualB = 0;
-      mult = 1.0;
-      records[teamA].wins++;
-      records[teamB].losses++;
-    } else if (scoreA === scoreB) {
-      // Both null only when both are forfeits, handled above; in the non-forfeit path these are numbers
-      actualA = 0.5;
-      actualB = 0.5;
-      mult = 1.0;
-      records[teamA].ties++;
-      records[teamB].ties++;
-      records[teamA].pointsFor += scoreA!;
-      records[teamA].pointsAgainst += scoreB!;
-      records[teamB].pointsFor += scoreB!;
-      records[teamB].pointsAgainst += scoreA!;
-    } else {
-      actualA = scoreA! > scoreB! ? 1 : 0;
-      actualB = scoreB! > scoreA! ? 1 : 0;
-      mult = marginMultiplier(
-        Math.max(scoreA!, scoreB!),
-        Math.min(scoreA!, scoreB!),
-      );
-
-      if (scoreA! > scoreB!) {
-        records[teamA].wins++;
-        records[teamB].losses++;
-      } else {
-        records[teamA].losses++;
-        records[teamB].wins++;
-      }
-
-      records[teamA].pointsFor += scoreA!;
-      records[teamA].pointsAgainst += scoreB!;
-      records[teamB].pointsFor += scoreB!;
-      records[teamB].pointsAgainst += scoreA!;
-    }
+    const { actualA, actualB, mult } = resolveMatchOutcome(match, records);
 
     ratings[teamA] = Math.round(rA + K * mult * (actualA - eA));
     ratings[teamB] = Math.round(rB + K * mult * (actualB - eB));
