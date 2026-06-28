@@ -21,9 +21,11 @@
 ### Task 1: Refactor `elo.ts` — extract `trackWeekAppearance` and `resolveMatchOutcome`
 
 **Files:**
+
 - Modify: `src/lib/elo.ts`
 
 **Interfaces:**
+
 - Produces: same exported API (`expectedScore`, `marginMultiplier`, `processMatches`) — callers unchanged
 
 - [ ] **Step 1: Confirm baseline tests pass**
@@ -210,9 +212,11 @@ git commit -m "refactor(elo): extract trackWeekAppearance and resolveMatchOutcom
 ### Task 2: Refactor `sheets.ts` — layout diagram + named column constants
 
 **Files:**
+
 - Modify: `src/lib/sheets.ts`
 
 **Interfaces:**
+
 - Produces: same exported API — callers unchanged
 
 - [ ] **Step 1: Replace `src/lib/sheets.ts` with the refactored version**
@@ -434,9 +438,11 @@ git commit -m "refactor(sheets): add column layout diagram and named column cons
 ### Task 3: Refactor `+page.server.ts` — extract five helper functions
 
 **Files:**
+
 - Modify: `src/routes/+page.server.ts`
 
 **Interfaces:**
+
 - Consumes: `Ratings`, `Records` from `$lib/types.js` (add to import)
 - Produces: same exported `load()` function — SvelteKit callers unchanged
 
@@ -486,7 +492,10 @@ let cachedAt = 0;
 async function fetchLeagueData(
   sheetId: string,
   apiKey: string,
-): Promise<{ canonicalNames: string[]; officialRankings: Record<string, number> }> {
+): Promise<{
+  canonicalNames: string[];
+  officialRankings: Record<string, number>;
+}> {
   let canonicalNames: string[] = [];
   try {
     canonicalNames = await getCanonicalTeams(
@@ -603,8 +612,16 @@ function buildUpcomingIndex(
     const kB = normalize(m.teamB);
     if (!upcomingByTeam[kA]) upcomingByTeam[kA] = [];
     if (!upcomingByTeam[kB]) upcomingByTeam[kB] = [];
-    upcomingByTeam[kA].push({ opponent: m.teamB, prob: m.probA, court: m.court });
-    upcomingByTeam[kB].push({ opponent: m.teamA, prob: 100 - m.probA, court: m.court });
+    upcomingByTeam[kA].push({
+      opponent: m.teamB,
+      prob: m.probA,
+      court: m.court,
+    });
+    upcomingByTeam[kB].push({
+      opponent: m.teamA,
+      prob: 100 - m.probA,
+      court: m.court,
+    });
   }
   return upcomingByTeam;
 }
@@ -718,10 +735,12 @@ git commit -m "refactor(server): extract fetchLeagueData, fetchAllMatches, resol
 ### Task 4: Create `src/app.css` and `src/routes/+layout.svelte`
 
 **Files:**
+
 - Create: `src/app.css`
 - Create: `src/routes/+layout.svelte`
 
 **Interfaces:**
+
 - Produces: global styles available to all routes; `.layout` class usable in `+page.svelte`
 
 - [ ] **Step 1: Create `src/app.css`**
@@ -795,11 +814,13 @@ git commit -m "refactor(styles): extract global CSS to src/app.css via new +layo
 ### Task 5: Create leaf components — `PageHeader`, `SearchBar`, `GameLine`
 
 **Files:**
+
 - Create: `src/lib/components/PageHeader.svelte`
 - Create: `src/lib/components/SearchBar.svelte`
 - Create: `src/lib/components/GameLine.svelte`
 
 **Interfaces:**
+
 - Produces:
   - `PageHeader` — prop `seasonLabel: string`
   - `SearchBar` — prop `value: string` (bindable via `$bindable()`)
@@ -821,7 +842,9 @@ mkdir -p src/lib/components
 <header>
   <div class="deco">◆ ◆ ◆</div>
   <h1>STONEWALL <span class="accent">BOCCE</span></h1>
-  <p class="season-label">ELO Power Rankings · {seasonLabel} · Pittsburgh, PA</p>
+  <p class="season-label">
+    ELO Power Rankings · {seasonLabel} · Pittsburgh, PA
+  </p>
   <div class="deco">◆ ◆ ◆</div>
 </header>
 
@@ -979,9 +1002,11 @@ git commit -m "refactor(components): add PageHeader, SearchBar, GameLine leaf co
 ### Task 6: Create `UpcomingGames.svelte`
 
 **Files:**
+
 - Create: `src/lib/components/UpcomingGames.svelte`
 
 **Interfaces:**
+
 - Consumes: `GameLine` from `./GameLine.svelte`; `UpcomingGame` from `$lib/types.js`
 - Produces: prop `games: UpcomingGame[]` — renders game list or `–` when empty
 
@@ -1030,9 +1055,11 @@ git commit -m "refactor(components): add UpcomingGames component"
 ### Task 7: Create `TeamRow.svelte`
 
 **Files:**
+
 - Create: `src/lib/components/TeamRow.svelte`
 
 **Interfaces:**
+
 - Consumes: `UpcomingGames` from `./UpcomingGames.svelte`; `LeaderboardEntry` from `$lib/types.js`
 - Produces: props `team: LeaderboardEntry`, `hasUpcoming: boolean` — renders one `<tr>`
 
@@ -1062,9 +1089,12 @@ git commit -m "refactor(components): add UpcomingGames component"
       ? team.rankDiff > 0
         ? `ELO ranks ${team.rankDiff} spots higher than official`
         : `ELO ranks ${Math.abs(team.rankDiff)} spots lower than official`
-      : ""}
-  >{team.rank}</td>
-  <td class="name">{#if team.isMyTeam}🐕 {/if}{team.name}</td>
+      : ""}>{team.rank}</td
+  >
+  <td class="name"
+    >{#if team.isMyTeam}🐕
+    {/if}{team.name}</td
+  >
   <td class="num elo">{team.elo}</td>
   <td class="num">{team.wins}</td>
   <td class="num">{team.losses}</td>
@@ -1158,9 +1188,11 @@ git commit -m "refactor(components): add TeamRow component"
 ### Task 8: Create `LeaderboardTable.svelte`
 
 **Files:**
+
 - Create: `src/lib/components/LeaderboardTable.svelte`
 
 **Interfaces:**
+
 - Consumes: `TeamRow` from `./TeamRow.svelte`; `LeaderboardEntry` from `$lib/types.js`
 - Produces: props `entries: LeaderboardEntry[]`, `hasUpcoming: boolean`, `emptyMessage: string` — renders the full scrollable table
 
@@ -1282,9 +1314,11 @@ git commit -m "refactor(components): add LeaderboardTable component"
 ### Task 9: Update `+page.svelte` to use components; remove extracted styles
 
 **Files:**
+
 - Modify: `src/routes/+page.svelte`
 
 **Interfaces:**
+
 - Consumes:
   - `PageHeader` from `$lib/components/PageHeader.svelte` — prop `seasonLabel: string`
   - `SearchBar` from `$lib/components/SearchBar.svelte` — bindable prop `value: string`
@@ -1341,9 +1375,9 @@ git commit -m "refactor(components): add LeaderboardTable component"
   />
   <footer>
     <p>
-      <span class="elo-better">Green ELO #</span> = ELO ranks higher than official
-      · <span class="elo-worse">Red ELO #</span> = ELO ranks lower · ELO accounts
-      for score margins
+      <span class="elo-better">Green ELO #</span> = ELO ranks higher than
+      official · <span class="elo-worse">Red ELO #</span> = ELO ranks lower · ELO
+      accounts for score margins
     </p>
     <p>
       Updated {new Date(data.lastUpdated).toLocaleString()} ·

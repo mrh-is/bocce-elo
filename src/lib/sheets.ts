@@ -5,7 +5,29 @@ import type {
   OfficialRankings,
 } from "./types.js";
 
+// Spreadsheet row layout (0-indexed columns):
+// | 0:blank | 1:court | 2:teamA | 3:scoreA | 4:teamB | 5:scoreB | 6:blank | 7:teamA2 | 8:scoreA2 | 9:teamB2 | 10:scoreB2 |
+//
+// Left match block  = cols 1–5  → parseMatch(row, colOffset=1)
+// Right match block = cols 6–10 → parseMatch(row, colOffset=6)
+
 const SHEETS_BASE = "https://sheets.googleapis.com/v4/spreadsheets";
+
+const MATCH_COLS = {
+  COURT: 0,
+  TEAM_A: 1,
+  SCORE_A: 2,
+  TEAM_B: 3,
+  SCORE_B: 4,
+} as const;
+
+const MATCHUP_COLS = {
+  COURT: 1,
+  LEFT_A: 2,
+  LEFT_B: 4,
+  RIGHT_A: 7,
+  RIGHT_B: 9,
+} as const;
 
 export async function fetchTab(
   sheetId: string,
@@ -24,14 +46,14 @@ export async function fetchTab(
 }
 
 export function parseMatch(row: string[], colOffset: number): Match | null {
-  const teamA = row[colOffset + 1]?.trim();
-  const teamB = row[colOffset + 3]?.trim();
+  const teamA = row[colOffset + MATCH_COLS.TEAM_A]?.trim();
+  const teamB = row[colOffset + MATCH_COLS.TEAM_B]?.trim();
   if (!teamA || !teamB) {
     return null;
   }
 
-  const rawA = row[colOffset + 2]?.trim() ?? "";
-  const rawB = row[colOffset + 4]?.trim() ?? "";
+  const rawA = row[colOffset + MATCH_COLS.SCORE_A]?.trim() ?? "";
+  const rawB = row[colOffset + MATCH_COLS.SCORE_B]?.trim() ?? "";
 
   const forfeitA = rawA.toUpperCase() === "F";
   const forfeitB = rawB.toUpperCase() === "F";
@@ -110,24 +132,19 @@ export function parseScheduledMatch(
   row: string[],
   colOffset: number,
 ): ScheduledMatch | null {
-  const teamA = row[colOffset + 1]?.trim();
-  const teamB = row[colOffset + 3]?.trim();
+  const teamA = row[colOffset + MATCH_COLS.TEAM_A]?.trim();
+  const teamB = row[colOffset + MATCH_COLS.TEAM_B]?.trim();
   if (!teamA || !teamB) {
     return null;
   }
-  const rawA = row[colOffset + 2]?.trim() ?? "";
-  const rawB = row[colOffset + 4]?.trim() ?? "";
+  const rawA = row[colOffset + MATCH_COLS.SCORE_A]?.trim() ?? "";
+  const rawB = row[colOffset + MATCH_COLS.SCORE_B]?.trim() ?? "";
   if (!rawA && !rawB) {
     return { teamA, teamB };
   }
   return null;
 }
 
-// Returns all matchup pairs with court numbers regardless of score status.
-// Layout: col0=blank, col1=court#, col2=teamA, col3=scoreA, col4=teamB, col5=scoreB,
-//         col6=blank, col7=teamA2, col8=scoreA2, col9=teamB2, col10=scoreB2
-// Each row is one court; left block = game 1, right block = game 2 (after swap).
-// Both games on a row use the same court number.
 export function parseMatchupsWithCourts(rows: string[][]): MatchupWithCourt[] {
   const game1: MatchupWithCourt[] = [];
   const game2: MatchupWithCourt[] = [];
@@ -135,14 +152,14 @@ export function parseMatchupsWithCourts(rows: string[][]): MatchupWithCourt[] {
     if (!row || row.length < 5) {
       continue;
     }
-    const court = row[1]?.trim() || null;
-    const leftA = row[2]?.trim();
-    const leftB = row[4]?.trim();
+    const court = row[MATCHUP_COLS.COURT]?.trim() || null;
+    const leftA = row[MATCHUP_COLS.LEFT_A]?.trim();
+    const leftB = row[MATCHUP_COLS.LEFT_B]?.trim();
     if (leftA && leftB) {
       game1.push({ teamA: leftA, teamB: leftB, court });
     }
-    const rightA = row[7]?.trim();
-    const rightB = row[9]?.trim();
+    const rightA = row[MATCHUP_COLS.RIGHT_A]?.trim();
+    const rightB = row[MATCHUP_COLS.RIGHT_B]?.trim();
     if (rightA && rightB) {
       game2.push({ teamA: rightA, teamB: rightB, court });
     }

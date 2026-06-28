@@ -18,7 +18,7 @@ function trackWeekAppearance(
   weekAppearances: Record<number, Record<string, number>>,
   weekIndex: number,
   team: string,
-): void
+): void;
 ```
 
 ### `resolveMatchOutcome(match, records)`
@@ -29,12 +29,13 @@ Contains the three-branch decision (forfeit A / forfeit B / tie or win). Mutates
 function resolveMatchOutcome(
   match: Match,
   records: Records,
-): { actualA: number; actualB: number; mult: number }
+): { actualA: number; actualB: number; mult: number };
 ```
 
 ### Result
 
 After extraction, `processMatches` body reads as:
+
 1. Init state objects
 2. For each match: init teams → track appearances → compute expected scores → resolve outcome → update ratings → push history
 3. Return `{ ratings, records, weeklyRatings }`
@@ -64,8 +65,20 @@ A single comment block at the top of the file (below imports) diagrams the physi
 Replace magic number offsets with two named objects:
 
 ```ts
-const MATCH_COLS  = { COURT: 0, TEAM_A: 1, SCORE_A: 2, TEAM_B: 3, SCORE_B: 4 } as const;
-const MATCHUP_COLS = { COURT: 1, LEFT_A: 2, LEFT_B: 4, RIGHT_A: 7, RIGHT_B: 9 } as const;
+const MATCH_COLS = {
+  COURT: 0,
+  TEAM_A: 1,
+  SCORE_A: 2,
+  TEAM_B: 3,
+  SCORE_B: 4,
+} as const;
+const MATCHUP_COLS = {
+  COURT: 1,
+  LEFT_A: 2,
+  LEFT_B: 4,
+  RIGHT_A: 7,
+  RIGHT_B: 9,
+} as const;
 ```
 
 Internal accesses in `parseMatch`, `parseScheduledMatch`, and `parseMatchupsWithCourts` become `row[colOffset + MATCH_COLS.TEAM_A]`, `row[MATCHUP_COLS.LEFT_A]`, etc. The `colOffset` parameter on `parseMatch` and `parseScheduledMatch` is unchanged.
@@ -78,12 +91,12 @@ Extract four named functions so `load()` becomes a short orchestrator. All funct
 
 ### Extracted functions
 
-| Function | Returns | Notes |
-|---|---|---|
-| `fetchLeagueData(sheetId, apiKey)` | `{ canonicalNames, officialRankings }` | Swallows errors with `console.warn` for each fetch |
-| `fetchAllMatches(sheetId, apiKey, weekTabs, canonicalNames)` | `{ allMatches, weekRowsCache }` | Canonicalizes team names; preserves row cache for upcoming resolution |
-| `resolveUpcoming(weekRowsCache, sheetId, apiKey, ratings, canonicalNames)` | `UpcomingMatchup[]` | Handles UPCOMING_TAB branch vs. backwards-scan branch; probabilities computed here |
-| `buildLeaderboard(ratings, records, officialRankings, upcomingByTeam)` | `LeaderboardEntry[]` | Pure function; produces sorted leaderboard array |
+| Function                                                                   | Returns                                | Notes                                                                              |
+| -------------------------------------------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------- |
+| `fetchLeagueData(sheetId, apiKey)`                                         | `{ canonicalNames, officialRankings }` | Swallows errors with `console.warn` for each fetch                                 |
+| `fetchAllMatches(sheetId, apiKey, weekTabs, canonicalNames)`               | `{ allMatches, weekRowsCache }`        | Canonicalizes team names; preserves row cache for upcoming resolution              |
+| `resolveUpcoming(weekRowsCache, sheetId, apiKey, ratings, canonicalNames)` | `UpcomingMatchup[]`                    | Handles UPCOMING_TAB branch vs. backwards-scan branch; probabilities computed here |
+| `buildLeaderboard(ratings, records, officialRankings, upcomingByTeam)`     | `LeaderboardEntry[]`                   | Pure function; produces sorted leaderboard array                                   |
 
 A fifth helper `buildUpcomingIndex(upcomingMatches)` extracts the `upcomingByTeam` map construction (currently ~10 inline lines).
 
@@ -93,14 +106,39 @@ A fifth helper `buildUpcomingIndex(upcomingMatches)` extracts the `upcomingByTea
 export async function load(): Promise<PageData> {
   if (cached && Date.now() - cachedAt < CACHE_TTL_MS) return cached;
 
-  const { canonicalNames, officialRankings } = await fetchLeagueData(PUBLIC_SHEET_ID, PUBLIC_GOOGLE_API_KEY);
-  const { allMatches, weekRowsCache } = await fetchAllMatches(PUBLIC_SHEET_ID, PUBLIC_GOOGLE_API_KEY, WEEK_TABS, canonicalNames);
+  const { canonicalNames, officialRankings } = await fetchLeagueData(
+    PUBLIC_SHEET_ID,
+    PUBLIC_GOOGLE_API_KEY,
+  );
+  const { allMatches, weekRowsCache } = await fetchAllMatches(
+    PUBLIC_SHEET_ID,
+    PUBLIC_GOOGLE_API_KEY,
+    WEEK_TABS,
+    canonicalNames,
+  );
   const { ratings, records } = processMatches(allMatches);
-  const upcomingMatches = await resolveUpcoming(weekRowsCache, PUBLIC_SHEET_ID, PUBLIC_GOOGLE_API_KEY, ratings, canonicalNames);
+  const upcomingMatches = await resolveUpcoming(
+    weekRowsCache,
+    PUBLIC_SHEET_ID,
+    PUBLIC_GOOGLE_API_KEY,
+    ratings,
+    canonicalNames,
+  );
   const upcomingByTeam = buildUpcomingIndex(upcomingMatches);
-  const leaderboard = buildLeaderboard(ratings, records, officialRankings, upcomingByTeam);
+  const leaderboard = buildLeaderboard(
+    ratings,
+    records,
+    officialRankings,
+    upcomingByTeam,
+  );
 
-  cached = { leaderboard, seasonLabel: SEASON_LABEL, lastUpdated: new Date().toISOString(), sheetUrl: SHEET_URL, myTeam: MY_TEAM };
+  cached = {
+    leaderboard,
+    seasonLabel: SEASON_LABEL,
+    lastUpdated: new Date().toISOString(),
+    sheetUrl: SHEET_URL,
+    myTeam: MY_TEAM,
+  };
   cachedAt = Date.now();
   return cached;
 }
@@ -116,14 +154,14 @@ Cache logic and return are unchanged.
 
 All components go in `src/lib/components/`. Each carries its own scoped `<style>` block (Svelte idiom — components are self-contained).
 
-| File | Props | Responsibility |
-|---|---|---|
-| `PageHeader.svelte` | `seasonLabel: string` | Decorative diamonds, h1, season label |
-| `SearchBar.svelte` | `value: string` (bindable) | Search input with label |
-| `GameLine.svelte` | `court: string \| null`, `opponent: string`, `prob: number` | One game row: court + opponent + probability chip |
-| `UpcomingGames.svelte` | `games: UpcomingGame[]` | Full "This Week" cell content; renders `GameLine` per entry, `–` if empty |
-| `TeamRow.svelte` | `team: LeaderboardEntry`, `hasUpcoming: boolean` | One `<tr>`; contains `rankDiffClass` logic |
-| `LeaderboardTable.svelte` | `entries: LeaderboardEntry[]`, `hasUpcoming: boolean` | `<table>` with sticky `<thead>` and `<tbody>` iterating `TeamRow` |
+| File                      | Props                                                       | Responsibility                                                            |
+| ------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `PageHeader.svelte`       | `seasonLabel: string`                                       | Decorative diamonds, h1, season label                                     |
+| `SearchBar.svelte`        | `value: string` (bindable)                                  | Search input with label                                                   |
+| `GameLine.svelte`         | `court: string \| null`, `opponent: string`, `prob: number` | One game row: court + opponent + probability chip                         |
+| `UpcomingGames.svelte`    | `games: UpcomingGame[]`                                     | Full "This Week" cell content; renders `GameLine` per entry, `–` if empty |
+| `TeamRow.svelte`          | `team: LeaderboardEntry`, `hasUpcoming: boolean`            | One `<tr>`; contains `rankDiffClass` logic                                |
+| `LeaderboardTable.svelte` | `entries: LeaderboardEntry[]`, `hasUpcoming: boolean`       | `<table>` with sticky `<thead>` and `<tbody>` iterating `TeamRow`         |
 
 ### Global CSS → `src/app.css` + `src/routes/+layout.svelte`
 
@@ -138,9 +176,10 @@ No `+layout.svelte` exists yet. Create both:
 2. `src/routes/+layout.svelte` — minimal SvelteKit layout that imports the CSS:
    ```svelte
    <script>
-     import '../app.css';
+     import "../app.css";
      const { children } = $props();
    </script>
+
    {@render children()}
    ```
 
