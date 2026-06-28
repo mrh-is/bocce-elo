@@ -13,7 +13,7 @@ export function marginMultiplier(winnerScore, loserScore) {
 function initTeam(ratings, records, weeklyRatings, name) {
 	if (!ratings[name]) {
 		ratings[name] = STARTING_RATING;
-		records[name] = { wins: 0, losses: 0, pointsFor: 0, pointsAgainst: 0 };
+		records[name] = { wins: 0, losses: 0, ties: 0, pointsFor: 0, pointsAgainst: 0 };
 		weeklyRatings[name] = [];
 	}
 }
@@ -56,6 +56,14 @@ export function processMatches(matches) {
 			actualA = 1; actualB = 0; mult = 1.0;
 			records[teamA].wins++;
 			records[teamB].losses++;
+		} else if (scoreA === scoreB) {
+			actualA = 0.5; actualB = 0.5; mult = 1.0;
+			records[teamA].ties++;
+			records[teamB].ties++;
+			records[teamA].pointsFor += scoreA;
+			records[teamA].pointsAgainst += scoreB;
+			records[teamB].pointsFor += scoreB;
+			records[teamB].pointsAgainst += scoreA;
 		} else {
 			actualA = scoreA > scoreB ? 1 : 0;
 			actualB = scoreB > scoreA ? 1 : 0;

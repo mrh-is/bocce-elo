@@ -52,3 +52,61 @@ export async function getCanonicalTeams(sheetId, apiKey, summaryTab, nameCol) {
 	}
 	return [...names];
 }
+
+export async function getOfficialRankings(sheetId, apiKey, summaryTab, nameCol, rankCol) {
+	const rows = await fetchTab(sheetId, apiKey, summaryTab);
+	const rankings = {};
+	for (const row of rows.slice(1)) {
+		const name = row[nameCol]?.trim();
+		const rank = parseInt(row[rankCol]?.trim(), 10);
+		if (name && !isNaN(rank)) rankings[name] = rank;
+	}
+	return rankings;
+}
+
+export function parseScheduledMatch(row, colOffset) {
+	const teamA = row[colOffset + 1]?.trim();
+	const teamB = row[colOffset + 3]?.trim();
+	if (!teamA || !teamB) return null;
+	const rawA = row[colOffset + 2]?.trim() ?? '';
+	const rawB = row[colOffset + 4]?.trim() ?? '';
+	// "Scheduled" = teams listed but both scores blank (not yet played)
+	if (!rawA && !rawB) return { teamA, teamB };
+	return null;
+}
+
+// Returns all matchup pairs with court numbers regardless of score status.
+// Layout: col0=blank, col1=court#, col2=teamA, col3=scoreA, col4=teamB, col5=scoreB,
+//         col6=blank, col7=teamA2, col8=scoreA2, col9=teamB2, col10=scoreB2
+// Each row is one court; left block = game 1, right block = game 2 (after swap).
+// Both games on a row use the same court number.
+export function parseMatchupsWithCourts(rows) {
+	// Collect game-1 (left block) and game-2 (right block) separately so that
+	// every team's game 1 is inserted into upcomingByTeam before their game 2,
+	// regardless of which row each game appears in.
+	const game1 = [];
+	const game2 = [];
+	for (const row of rows) {
+		if (!row || row.length < 5) continue;
+		const court = row[1]?.trim() || null;
+		const leftA = row[2]?.trim();
+		const leftB = row[4]?.trim();
+		if (leftA && leftB) game1.push({ teamA: leftA, teamB: leftB, court });
+		const rightA = row[7]?.trim();
+		const rightB = row[9]?.trim();
+		if (rightA && rightB) game2.push({ teamA: rightA, teamB: rightB, court });
+	}
+	return [...game1, ...game2];
+}
+
+export function parseScheduledMatchTab(rows) {
+	const matches = [];
+	for (const row of rows) {
+		if (!row || row.length < 2) continue;
+		const left = parseScheduledMatch(row, 1);
+		if (left) matches.push(left);
+		const right = parseScheduledMatch(row, 6);
+		if (right) matches.push(right);
+	}
+	return matches;
+}
