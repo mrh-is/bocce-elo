@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "defaultMode": "auto",
+    "allow": [
+      "Bash(npm run test)",
+      "Bash(npm run check)",
+      "Bash(npx playwright test *)"
+    ],
+    "additionalDirectories": ["/Users/michael/Projects/mrh-is.github.io"]
+  }
+}
