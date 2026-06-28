@@ -1,5 +1,5 @@
 // Keys are normalize()-d strings; values are exact canonical names from the RANKINGS tab.
-export const ALIASES = {
+export const ALIASES: Record<string, string> = {
 	// Truncated cell values (sheet columns too narrow for full name)
 	'1 ball 2 balls': '1 Ball, 2 Balls, Red Balls, Blue Balls',
 	'boccer i barely': 'Bocce-r? I barely know her!',
@@ -35,11 +35,11 @@ export const ALIASES = {
 	'l o pallina intent': 'Lawn and Order: Pallina Intent',
 };
 
-export function normalize(name) {
+export function normalize(name: string): string {
 	return name.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim().replace(/\s+/g, ' ');
 }
 
-export function canonicalize(name, canonicalNames) {
+export function canonicalize(name: string, canonicalNames: string[]): string {
 	const n = normalize(name);
 
 	if (ALIASES[n]) return ALIASES[n];
