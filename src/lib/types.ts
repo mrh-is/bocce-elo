@@ -1,4 +1,4 @@
-export type Match = {
+export interface Match {
   teamA: string;
   teamB: string;
   scoreA: number | null;
@@ -6,45 +6,45 @@ export type Match = {
   forfeitA: boolean;
   forfeitB: boolean;
   weekIndex?: number;
-};
+}
 
-export type ScheduledMatch = {
+export interface ScheduledMatch {
   teamA: string;
   teamB: string;
-};
+}
 
-export type MatchupWithCourt = {
+export interface MatchupWithCourt {
   teamA: string;
   teamB: string;
   court: string | null;
-};
+}
 
-export type TeamRecord = {
+export interface TeamRecord {
   wins: number;
   losses: number;
   ties: number;
   pointsFor: number;
   pointsAgainst: number;
-};
+}
 
 export type Ratings = Record<string, number>;
 export type Records = Record<string, TeamRecord>;
 export type WeeklyRatings = Record<string, number[]>;
 export type OfficialRankings = Record<string, number>;
 
-export type ProcessMatchesResult = {
+export interface ProcessMatchesResult {
   ratings: Ratings;
   records: Records;
   weeklyRatings: WeeklyRatings;
-};
+}
 
-export type UpcomingGame = {
+export interface UpcomingGame {
   opponent: string;
   prob: number;
   court: string | null;
-};
+}
 
-export type LeaderboardEntry = {
+export interface LeaderboardEntry {
   rank: number;
   officialRank: number | null;
   rankDiff: number | null;
@@ -55,12 +55,12 @@ export type LeaderboardEntry = {
   ties: number;
   upcoming: UpcomingGame[];
   isMyTeam: boolean;
-};
+}
 
-export type PageData = {
+export interface PageData {
   leaderboard: LeaderboardEntry[];
   seasonLabel: string;
   lastUpdated: string;
   sheetUrl: string;
   myTeam: string;
-};
+}
