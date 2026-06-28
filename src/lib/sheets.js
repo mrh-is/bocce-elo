@@ -34,12 +34,10 @@ export function parseMatchTab(rows) {
 	const matches = [];
 	for (const row of rows) {
 		if (!row || row.length < 2) continue;
-		// Left block: [court#, teamA, scoreA, teamB, scoreB, blank, ...]
-		const left = parseMatch(row, 0);
+		// Actual sheet layout: [blank, court#, teamA, scoreA, teamB, scoreB, blank, teamA2, scoreA2, teamB2, scoreB2]
+		const left = parseMatch(row, 1);
 		if (left) matches.push(left);
-		// Right block: [..., blank, teamA2, scoreA2, teamB2, scoreB2]
-		// No court# in the right block — blank is at index 5, teamA2 at index 6.
-		const right = parseMatch(row, 5);
+		const right = parseMatch(row, 6);
 		if (right) matches.push(right);
 	}
 	return matches;

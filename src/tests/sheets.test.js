@@ -58,11 +58,11 @@ describe('parseMatch', () => {
 
 describe('parseMatchTab', () => {
 	it('extracts matches from both blocks across multiple rows', () => {
-		// Right block has no second court# — layout: [court, tA, sA, tB, sB, blank, tA2, sA2, tB2, sB2]
+		// Actual sheet layout: [blank, court#, tA, sA, tB, sB, blank, tA2, sA2, tB2, sB2]
 		const rows = [
-			['1', 'Alpha', '21', 'Beta', '14', '', 'Gamma', '18', 'Delta', '21'],
+			['', '1', 'Alpha', '21', 'Beta', '14', '', 'Gamma', '18', 'Delta', '21'],
 			[],  // blank row — skip
-			['3', 'Epsilon', '21', 'Zeta', '10', '', 'Eta', 'F', 'Theta', '21'],
+			['', '3', 'Epsilon', '21', 'Zeta', '10', '', 'Eta', 'F', 'Theta', '21'],
 		];
 		const matches = parseMatchTab(rows);
 		expect(matches).toHaveLength(4);
@@ -82,7 +82,7 @@ describe('parseMatchTab', () => {
 
 	it('skips a block when both score cells are blank', () => {
 		const rows = [
-			['1', 'Alpha', '', 'Beta', ''],
+			['', '1', 'Alpha', '', 'Beta', ''],
 		];
 		expect(parseMatchTab(rows)).toHaveLength(0);
 	});
