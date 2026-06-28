@@ -5,9 +5,14 @@ import { processMatches } from '$lib/elo.js';
 import { WEEK_TABS, SUMMARY_TAB, RANKINGS_NAME_COL, SEASON_LABEL } from '$lib/config.js';
 
 export async function load() {
-	const canonicalNames = await getCanonicalTeams(
-		PUBLIC_SHEET_ID, PUBLIC_GOOGLE_API_KEY, SUMMARY_TAB, RANKINGS_NAME_COL
-	);
+	let canonicalNames = [];
+	try {
+		canonicalNames = await getCanonicalTeams(
+			PUBLIC_SHEET_ID, PUBLIC_GOOGLE_API_KEY, SUMMARY_TAB, RANKINGS_NAME_COL
+		);
+	} catch (err) {
+		console.warn(`[load] Could not fetch canonical teams: ${err.message}`);
+	}
 
 	const allMatches = [];
 	for (let i = 0; i < WEEK_TABS.length; i++) {
