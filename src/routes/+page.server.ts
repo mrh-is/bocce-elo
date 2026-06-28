@@ -18,16 +18,23 @@ import {
   SHEET_URL,
   MY_TEAM,
 } from "$lib/config.js";
+import type {
+  Match,
+  LeaderboardEntry,
+  UpcomingGame,
+  PageData,
+} from "$lib/types.js";
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
-let cached = null;
+let cached: PageData | null = null;
 let cachedAt = 0;
 
-export async function load() {
+export async function load(): Promise<PageData> {
   if (cached && Date.now() - cachedAt < CACHE_TTL_MS) {
     return cached;
   }
-  let canonicalNames = [];
+
+  let canonicalNames: string[] = [];
   try {
     canonicalNames = await getCanonicalTeams(
       PUBLIC_SHEET_ID,
@@ -36,10 +43,12 @@ export async function load() {
       RANKINGS_NAME_COL,
     );
   } catch (err) {
-    console.warn(`[load] Could not fetch canonical teams: ${err.message}`);
+    console.warn(
+      `[load] Could not fetch canonical teams: ${(err as Error).message}`,
+    );
   }
 
-  let officialRankings = {};
+  let officialRankings: Record<string, number> = {};
   try {
     officialRankings = await getOfficialRankings(
       PUBLIC_SHEET_ID,
@@ -49,14 +58,16 @@ export async function load() {
       RANKINGS_RANK_COL,
     );
   } catch (err) {
-    console.warn(`[load] Could not fetch official rankings: ${err.message}`);
+    console.warn(
+      `[load] Could not fetch official rankings: ${(err as Error).message}`,
+    );
   }
 
-  const allMatches = [];
-  const weekRowsCache = [];
+  const allMatches: Match[] = [];
+  const weekRowsCache: { weekIndex: number; rows: string[][] }[] = [];
 
   for (let i = 0; i < WEEK_TABS.length; i++) {
-    let rows;
+    let rows: string[][];
     try {
       rows = await fetchTab(
         PUBLIC_SHEET_ID,
@@ -64,11 +75,13 @@ export async function load() {
         WEEK_TABS[i],
       );
     } catch (err) {
-      console.warn(`[load] Skipping tab "${WEEK_TABS[i]}": ${err.message}`);
+      console.warn(
+        `[load] Skipping tab "${WEEK_TABS[i]}": ${(err as Error).message}`,
+      );
       continue;
     }
     weekRowsCache.push({ weekIndex: i, rows });
-    const matches = parseMatchTab(rows).map((m) => ({
+    const matches: Match[] = parseMatchTab(rows).map((m) => ({
       ...m,
       teamA: canonicalize(m.teamA, canonicalNames),
       teamB: canonicalize(m.teamB, canonicalNames),
@@ -84,7 +97,14 @@ export async function load() {
   } = processMatches(allMatches);
 
   // Resolve upcoming matchups (with court numbers)
-  const resolveMatchups = (rows) =>
+  const resolveMatchups = (
+    rows: string[][],
+  ): {
+    teamA: string;
+    teamB: string;
+    court: string | null;
+    probA: number;
+  }[] =>
     parseMatchupsWithCourts(rows).map((m) => {
       const tA = canonicalize(m.teamA, canonicalNames);
       const tB = canonicalize(m.teamB, canonicalNames);
@@ -98,7 +118,12 @@ export async function load() {
       };
     });
 
-  let upcomingMatches = [];
+  let upcomingMatches: {
+    teamA: string;
+    teamB: string;
+    court: string | null;
+    probA: number;
+  }[] = [];
   if (UPCOMING_TAB) {
     try {
       const rows = await fetchTab(
@@ -109,7 +134,7 @@ export async function load() {
       upcomingMatches = resolveMatchups(rows);
     } catch (err) {
       console.warn(
-        `[load] Could not fetch upcoming tab "${UPCOMING_TAB}": ${err.message}`,
+        `[load] Could not fetch upcoming tab "${UPCOMING_TAB}": ${(err as Error).message}`,
       );
     }
   } else {
@@ -123,8 +148,8 @@ export async function load() {
   }
 
   // Build team → array of this-week games (normalize keys for robust matching)
-  const upcomingByTeam = {};
-  const addUpcoming = (key, entry) => {
+  const upcomingByTeam: Record<string, UpcomingGame[]> = {};
+  const addUpcoming = (key: string, entry: UpcomingGame): void => {
     const k = normalize(key);
     if (!upcomingByTeam[k]) {
       upcomingByTeam[k] = [];
@@ -140,7 +165,7 @@ export async function load() {
     });
   }
 
-  const leaderboard = Object.keys(ratings)
+  const leaderboard: LeaderboardEntry[] = Object.keys(ratings)
     .sort((a, b) => ratings[b] - ratings[a])
     .map((name, i) => {
       const rec = records[name] ?? {

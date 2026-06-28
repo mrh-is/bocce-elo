@@ -4,7 +4,6 @@ import type {
   Records,
   WeeklyRatings,
   ProcessMatchesResult,
-  TeamRecord,
 } from "./types.js";
 
 const STARTING_RATING = 1000;

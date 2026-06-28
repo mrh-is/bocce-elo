@@ -9,5 +9,10 @@
     "module": "ESNext",
     "target": "ESNext"
   },
-  "include": ["src/**/*.ts", "src/**/*.svelte", "vite.config.ts"]
+  "include": [
+    ".svelte-kit/ambient.d.ts",
+    "src/**/*.ts",
+    "src/**/*.svelte",
+    "vite.config.ts"
+  ]
 }
