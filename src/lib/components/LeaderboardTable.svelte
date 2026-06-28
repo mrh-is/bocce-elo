@@ -83,11 +83,14 @@
     text-align: center;
     color: #3a5a3a;
     padding: 2rem;
+    border-top: 1px solid #111911;
+    vertical-align: middle;
   }
   @media (max-width: 600px) {
     .table-wrap {
       flex: none;
       overflow-y: visible;
+      overflow-x: auto;
     }
   }
 </style>
