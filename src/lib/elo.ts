@@ -4,6 +4,7 @@ import type {
   Records,
   WeeklyRatings,
   ProcessMatchesResult,
+  TeamRecord,
 } from "./types.js";
 
 const STARTING_RATING = 1000;
@@ -54,19 +55,25 @@ export function processMatches(matches: Match[]): ProcessMatchesResult {
     initTeam(ratings, records, weeklyRatings, teamB);
 
     if (weekIndex !== undefined) {
-      if (!weekAppearances[weekIndex]) weekAppearances[weekIndex] = {};
+      if (!weekAppearances[weekIndex]) {
+        weekAppearances[weekIndex] = {};
+      }
       weekAppearances[weekIndex][teamA] =
         (weekAppearances[weekIndex][teamA] ?? 0) + 1;
       weekAppearances[weekIndex][teamB] =
         (weekAppearances[weekIndex][teamB] ?? 0) + 1;
-      if (weekAppearances[weekIndex][teamA] > 2)
+      if (weekAppearances[weekIndex][teamA] > 2) {
+        // eslint-disable-next-line no-console
         console.warn(
           `[elo] ${teamA} appears more than 2 times in week ${weekIndex}`,
         );
-      if (weekAppearances[weekIndex][teamB] > 2)
+      }
+      if (weekAppearances[weekIndex][teamB] > 2) {
+        // eslint-disable-next-line no-console
         console.warn(
           `[elo] ${teamB} appears more than 2 times in week ${weekIndex}`,
         );
+      }
     }
 
     const rA = ratings[teamA];
