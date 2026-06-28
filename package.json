@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "vitest",
     "lint": "prettier --check . && eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "deploy": "npm run build && wrangler pages deploy .svelte-kit/cloudflare --project-name bocce-elo"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
