@@ -50,6 +50,10 @@ Both are `PUBLIC_` so they're embedded in the client bundle (the Sheet is public
 
 Each new season: update `config.ts` (new sheet ID if applicable, new tab names, `MY_TEAM`), and extend `ALIASES` in `names.ts` for any new truncated or misspelled team names found in the week tabs.
 
+## Implementation plans
+
+Specs and implementation plans live in `docs/superpowers/plans/`. Commit them alongside the code they describe — they serve as the design record for non-obvious decisions. Don't delete them after the work is done.
+
 ## Deployment
 
 ```bash
