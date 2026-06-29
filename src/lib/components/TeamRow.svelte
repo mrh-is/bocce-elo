@@ -7,27 +7,20 @@
     hasUpcoming,
   }: { team: LeaderboardEntry; hasUpcoming: boolean } = $props();
 
-  function compareDiff(
-    diff: number | null,
-    greaterText: string,
-    lessText: string,
-  ): string {
+  function rankDiffClass(diff: number | null): string {
     if (diff === null || diff === 0) {
       return "";
     }
-    return diff > 0 ? greaterText : lessText;
-  }
-
-  function rankDiffClass(diff: number | null): string {
-    return compareDiff(diff, "elo-better", "elo-worse");
+    return diff > 0 ? "elo-better" : "elo-worse";
   }
 
   function hoverText(diff: number | null): string {
-    return compareDiff(
-      diff,
-      `ELO ranks ${diff} spots higher than official`,
-      `ELO ranks ${Math.abs(diff!)} spots lower than official`,
-    );
+    if (diff === null || diff === 0) {
+      return "";
+    }
+    return diff > 0
+      ? `ELO ranks ${diff} spots higher than official`
+      : `ELO ranks ${Math.abs(diff)} spots lower than official`;
   }
 
   const medals: Record<number, string> = { 1: "🥇", 2: "🥈", 3: "🥉" };

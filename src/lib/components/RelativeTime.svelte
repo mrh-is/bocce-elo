@@ -1,10 +1,17 @@
 <script lang="ts">
-  const { date }: { date: Date } = $props();
+  const { date }: { date: string } = $props();
 
-  const exactTimestamp = $derived(date.toLocaleString());
+  const parsedDate = $derived(new Date(date));
+  const exactTimestamp = $derived(parsedDate.toLocaleString());
 
   function relativeTime(from: Date, now: number): string {
     const diff = Math.floor((now - from.getTime()) / 1000);
+    if (!Number.isFinite(diff)) {
+      return "unknown";
+    }
+    if (diff < 0) {
+      return "just now";
+    }
     if (diff < 60) {
       return `${diff} second${diff === 1 ? "" : "s"} ago`;
     }
@@ -21,7 +28,7 @@
   }
 
   let now = $state(Date.now());
-  const text = $derived(relativeTime(date, now));
+  const text = $derived(relativeTime(parsedDate, now));
 
   $effect(() => {
     const interval = setInterval(() => {

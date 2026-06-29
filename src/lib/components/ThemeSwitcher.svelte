@@ -1,11 +1,16 @@
 <script lang="ts">
   type Theme = "light" | "dark" | "system";
 
-  let theme = $state<Theme>(
-    (typeof localStorage !== "undefined"
-      ? (localStorage.getItem("theme") as Theme)
-      : null) ?? "system",
-  );
+  const THEMES: Theme[] = ["light", "dark", "system"];
+
+  function isTheme(value: string | null): value is Theme {
+    return THEMES.includes(value as Theme);
+  }
+
+  const storedTheme =
+    typeof localStorage !== "undefined" ? localStorage.getItem("theme") : null;
+
+  let theme = $state<Theme>(isTheme(storedTheme) ? storedTheme : "system");
 
   function set(t: Theme) {
     theme = t;

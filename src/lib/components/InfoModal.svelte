@@ -6,17 +6,68 @@
     open = $bindable(false),
     lastUpdated,
     sheetUrl,
-  }: { open: boolean; lastUpdated: Date; sheetUrl: string } = $props();
+  }: { open: boolean; lastUpdated: string; sheetUrl: string } = $props();
 
   const issuesUrl = "https://github.com/mrh-is/bocce-elo/issues/new";
+
+  let closeButton = $state<HTMLButtonElement | undefined>(undefined);
+  let previouslyFocused: HTMLElement | null = null;
+
+  function focusableElements(): HTMLElement[] {
+    return Array.from(
+      document.querySelectorAll<HTMLElement>(
+        ".modal button, .modal a[href], .modal [tabindex]:not([tabindex='-1'])",
+      ),
+    ).filter((element) => !element.hasAttribute("disabled"));
+  }
+
+  $effect(() => {
+    if (!open) {
+      return;
+    }
+
+    previouslyFocused = document.activeElement as HTMLElement | null;
+    closeButton?.focus();
+
+    return () => {
+      previouslyFocused?.focus();
+      previouslyFocused = null;
+    };
+  });
 
   function close() {
     open = false;
   }
 
   function onKeydown(e: KeyboardEvent) {
+    if (!open) {
+      return;
+    }
+
     if (e.key === "Escape") {
       close();
+      return;
+    }
+
+    if (e.key !== "Tab") {
+      return;
+    }
+
+    const focusable = focusableElements();
+    if (focusable.length === 0) {
+      e.preventDefault();
+      return;
+    }
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
     }
   }
 </script>
@@ -45,7 +96,14 @@
       onclick={(e) => e.stopPropagation()}
       onkeydown={(e) => e.stopPropagation()}
     >
-      <button class="close-btn" onclick={close} aria-label="Close">✕</button>
+      <button
+        bind:this={closeButton}
+        class="close-btn"
+        onclick={close}
+        aria-label="Close"
+      >
+        ✕
+      </button>
 
       <h2>How to read this</h2>
 
