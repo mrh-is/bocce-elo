@@ -30,10 +30,15 @@ interface BatchGetResponse {
   valueRanges?: { values?: string[][] }[];
 }
 
+interface FetchTabsOptions {
+  timeoutMs?: number;
+}
+
 export async function fetchTabs(
   sheetId: string,
   apiKey: string,
   tabNames: string[],
+  options: FetchTabsOptions = {},
 ): Promise<RowsByTab> {
   const uniqueTabNames = [...new Set(tabNames)];
   if (uniqueTabNames.length === 0) {
@@ -46,7 +51,28 @@ export async function fetchTabs(
   }
 
   const url = `${SHEETS_BASE}/${sheetId}/values:batchGet?${params}`;
-  const res = await fetch(url);
+
+  const controller = new AbortController();
+  const timeoutMs = options.timeoutMs ?? 8_000;
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  let res: Response;
+  try {
+    res = await fetch(url, { signal: controller.signal });
+  } catch (err) {
+    if (err instanceof DOMException && err.name === "AbortError") {
+      throw new Error(
+        `Sheets API request timed out after ${timeoutMs}ms for tabs ${uniqueTabNames
+          .map((tab) => `"${tab}"`)
+          .join(", ")}`,
+        { cause: err },
+      );
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeout);
+  }
+
   if (!res.ok) {
     throw new Error(
       `Sheets API error for tabs ${uniqueTabNames.map((tab) => `"${tab}"`).join(", ")}: ${res.status} ${res.statusText}`,
@@ -62,6 +88,13 @@ export async function fetchTabs(
       valueRanges[index]?.values ?? [],
     ]),
   );
+}
+
+function parseScore(raw: string): number | null {
+  if (!/^\d+$/.test(raw)) {
+    return null;
+  }
+  return Number(raw);
 }
 
 export function parseMatch(row: string[], colOffset: number): Match | null {
@@ -81,15 +114,24 @@ export function parseMatch(row: string[], colOffset: number): Match | null {
     if (!rawA && !rawB) {
       return null;
     }
-    const scoreA = parseInt(rawA, 10);
-    const scoreB = parseInt(rawB, 10);
-    if (isNaN(scoreA) || isNaN(scoreB)) {
+    const scoreA = parseScore(rawA);
+    const scoreB = parseScore(rawB);
+    if (scoreA === null || scoreB === null) {
       return null;
     }
-    return { teamA, teamB, scoreA, scoreB, forfeitA: false, forfeitB: false };
+    return { kind: "scored", teamA, teamB, scoreA, scoreB };
   }
 
-  return { teamA, teamB, scoreA: null, scoreB: null, forfeitA, forfeitB };
+  if (forfeitA && forfeitB) {
+    return null;
+  }
+
+  return {
+    kind: "forfeit",
+    teamA,
+    teamB,
+    forfeitingTeam: forfeitA ? "A" : "B",
+  };
 }
 
 export function parseMatchTab(rows: string[][]): Match[] {
@@ -111,6 +153,8 @@ export function parseMatchTab(rows: string[][]): Match[] {
   return matches;
 }
 
+// Returns canonical names in sheet row order; callers use these for lookup only,
+// not positional indexing, so order does not matter.
 export function parseCanonicalTeams(
   rows: string[][],
   nameCol: number,
@@ -142,8 +186,8 @@ export function parseOfficialRankings(
 }
 
 export function parseMatchupsWithCourts(rows: string[][]): MatchupWithCourt[] {
-  const game1: MatchupWithCourt[] = [];
-  const game2: MatchupWithCourt[] = [];
+  const leftMatchups: MatchupWithCourt[] = [];
+  const rightMatchups: MatchupWithCourt[] = [];
   for (const row of rows) {
     if (!row || row.length < 5) {
       continue;
@@ -152,13 +196,13 @@ export function parseMatchupsWithCourts(rows: string[][]): MatchupWithCourt[] {
     const leftA = row[MATCHUP_COLS.LEFT_A]?.trim();
     const leftB = row[MATCHUP_COLS.LEFT_B]?.trim();
     if (leftA && leftB) {
-      game1.push({ teamA: leftA, teamB: leftB, court });
+      leftMatchups.push({ teamA: leftA, teamB: leftB, court });
     }
     const rightA = row[MATCHUP_COLS.RIGHT_A]?.trim();
     const rightB = row[MATCHUP_COLS.RIGHT_B]?.trim();
     if (rightA && rightB) {
-      game2.push({ teamA: rightA, teamB: rightB, court });
+      rightMatchups.push({ teamA: rightA, teamB: rightB, court });
     }
   }
-  return [...game1, ...game2];
+  return [...leftMatchups, ...rightMatchups];
 }

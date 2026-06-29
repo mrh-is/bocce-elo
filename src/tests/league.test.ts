@@ -129,4 +129,28 @@ describe("buildLeaguePageData", () => {
 
     expect(fetchMock).not.toHaveBeenCalled();
   });
+
+  it("rank field reflects ELO position, independent of row order (which follows official rank)", () => {
+    // Alpha beats Beta; official standings rank Beta #1, Alpha #2
+    // Rows are ordered Beta, Alpha — but rank fields should be Alpha=1, Beta=2 by ELO
+    const pageData = buildLeaguePageData(
+      {
+        Standings: [
+          ["", "RANKING", "", "TEAM"],
+          ["", "1", "", "Beta"],
+          ["", "2", "", "Alpha"],
+        ],
+        "Week 1": [["", "1", "Alpha", "21", "Beta", "11"]],
+        "Week 2": [],
+      },
+      { ...baseConfig, upcomingTab: null },
+    );
+
+    // Rows are in official rank order: Beta first, then Alpha
+    expect(pageData.leaderboard[0].name).toBe("Beta");
+    expect(pageData.leaderboard[1].name).toBe("Alpha");
+    // But the rank field is ELO rank: Alpha won so Alpha is ELO rank 1
+    expect(pageData.leaderboard.find((t) => t.name === "Alpha")!.rank).toBe(1);
+    expect(pageData.leaderboard.find((t) => t.name === "Beta")!.rank).toBe(2);
+  });
 });

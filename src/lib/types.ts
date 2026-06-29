@@ -1,17 +1,21 @@
-export interface Match {
+interface MatchBase {
   teamA: string;
   teamB: string;
-  scoreA: number | null;
-  scoreB: number | null;
-  forfeitA: boolean;
-  forfeitB: boolean;
   weekIndex?: number;
 }
 
-export interface ScheduledMatch {
-  teamA: string;
-  teamB: string;
+export interface ScoredMatch extends MatchBase {
+  kind: "scored";
+  scoreA: number;
+  scoreB: number;
 }
+
+export interface ForfeitMatch extends MatchBase {
+  kind: "forfeit";
+  forfeitingTeam: "A" | "B";
+}
+
+export type Match = ScoredMatch | ForfeitMatch;
 
 export interface MatchupWithCourt {
   teamA: string;
@@ -29,13 +33,11 @@ export interface TeamRecord {
 
 export type Ratings = Record<string, number>;
 export type Records = Record<string, TeamRecord>;
-export type WeeklyRatings = Record<string, number[]>;
 export type OfficialRankings = Record<string, number>;
 
 export interface ProcessMatchesResult {
   ratings: Ratings;
   records: Records;
-  weeklyRatings: WeeklyRatings;
 }
 
 export interface UpcomingGame {
@@ -60,7 +62,7 @@ export interface LeaderboardEntry {
 export interface PageData {
   leaderboard: LeaderboardEntry[];
   seasonLabel: string;
-  lastUpdated: Date;
+  lastUpdated: string;
   sheetUrl: string;
   myTeam: string;
 }

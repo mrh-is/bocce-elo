@@ -4,6 +4,7 @@ import {
   parseMatchTab,
   parseCanonicalTeams,
   parseOfficialRankings,
+  parseMatchupsWithCourts,
   fetchTabs,
 } from "../lib/sheets.js";
 
@@ -27,12 +28,11 @@ describe("parseMatch", () => {
       "21",
     ];
     expect(parseMatch(row, 0)).toEqual({
+      kind: "scored",
       teamA: "Team Alpha",
       teamB: "Team Beta",
       scoreA: 21,
       scoreB: 14,
-      forfeitA: false,
-      forfeitB: false,
     });
   });
 
@@ -52,12 +52,11 @@ describe("parseMatch", () => {
       "21",
     ];
     expect(parseMatch(row, 5)).toEqual({
+      kind: "scored",
       teamA: "Team Gamma",
       teamB: "Team Delta",
       scoreA: 18,
       scoreB: 21,
-      forfeitA: false,
-      forfeitB: false,
     });
   });
 
@@ -74,30 +73,41 @@ describe("parseMatch", () => {
   it("handles forfeit on score A", () => {
     const row = ["1", "Team Alpha", "F", "Team Beta", "21"];
     expect(parseMatch(row, 0)).toEqual({
+      kind: "forfeit",
       teamA: "Team Alpha",
       teamB: "Team Beta",
-      scoreA: null,
-      scoreB: null,
-      forfeitA: true,
-      forfeitB: false,
+      forfeitingTeam: "A",
     });
   });
 
   it("handles forfeit on score B", () => {
     const row = ["1", "Team Alpha", "21", "Team Beta", "F"];
     expect(parseMatch(row, 0)).toEqual({
+      kind: "forfeit",
       teamA: "Team Alpha",
       teamB: "Team Beta",
-      scoreA: null,
-      scoreB: null,
-      forfeitA: false,
-      forfeitB: true,
+      forfeitingTeam: "B",
     });
   });
 
   it("returns null when row is too short for given colOffset", () => {
     const row = ["1", "Team Alpha", "21", "Team Beta", "14"];
     expect(parseMatch(row, 5)).toBeNull();
+  });
+
+  it("rejects score cells with trailing non-numeric characters", () => {
+    const row = ["1", "Team Alpha", "21abc", "Team Beta", "14"];
+    expect(parseMatch(row, 0)).toBeNull();
+  });
+
+  it("rejects decimal score cells", () => {
+    const row = ["1", "Team Alpha", "20.5", "Team Beta", "14"];
+    expect(parseMatch(row, 0)).toBeNull();
+  });
+
+  it("rejects negative score cells", () => {
+    const row = ["1", "Team Alpha", "-1", "Team Beta", "14"];
+    expect(parseMatch(row, 0)).toBeNull();
   });
 });
 
@@ -113,7 +123,7 @@ describe("parseMatchTab", () => {
     expect(matches).toHaveLength(4);
     expect(matches[0].teamA).toBe("Alpha");
     expect(matches[1].teamA).toBe("Gamma");
-    expect(matches[3].forfeitA).toBe(true);
+    expect(matches[3].kind).toBe("forfeit");
     expect(matches[3].teamA).toBe("Eta");
   });
 
@@ -157,6 +167,44 @@ describe("parseOfficialRankings", () => {
       Alpha: 1,
       Beta: 2,
     });
+  });
+});
+
+describe("parseMatchupsWithCourts", () => {
+  it("extracts courts from both left and right game blocks", () => {
+    // Row layout: [blank, court, leftA, blank, leftB, blank, blank, rightA, blank, rightB, blank]
+    const rows = [
+      ["", "1", "Alpha", "", "Beta", "", "", "Gamma", "", "Delta", ""],
+      ["", "2", "Epsilon", "", "Zeta", "", "", "Eta", "", "Theta", ""],
+    ];
+    const matchups = parseMatchupsWithCourts(rows);
+    expect(matchups).toHaveLength(4);
+    // Left matchups come first
+    expect(matchups[0]).toEqual({ teamA: "Alpha", teamB: "Beta", court: "1" });
+    expect(matchups[1]).toEqual({
+      teamA: "Epsilon",
+      teamB: "Zeta",
+      court: "2",
+    });
+    // Right matchups follow
+    expect(matchups[2]).toEqual({ teamA: "Gamma", teamB: "Delta", court: "1" });
+    expect(matchups[3]).toEqual({ teamA: "Eta", teamB: "Theta", court: "2" });
+  });
+
+  it("skips incomplete matchups missing one team name", () => {
+    const rows = [
+      ["", "1", "Alpha", "", "", "", "", "Gamma", "", "Delta", ""],
+      ["", "2", "Epsilon", "", "Zeta", "", "", "", "", "Theta", ""],
+    ];
+    const matchups = parseMatchupsWithCourts(rows);
+    // Alpha/blank skipped, Epsilon/Zeta kept, Gamma/Delta kept, blank/Theta skipped
+    expect(matchups).toHaveLength(2);
+    expect(matchups[0]).toEqual({
+      teamA: "Epsilon",
+      teamB: "Zeta",
+      court: "2",
+    });
+    expect(matchups[1]).toEqual({ teamA: "Gamma", teamB: "Delta", court: "1" });
   });
 });
 
@@ -208,5 +256,36 @@ describe("fetchTabs", () => {
     ).rejects.toThrow(
       'Sheets API error for tabs "Standings", "Week 1": 403 Forbidden',
     );
+  });
+
+  it("aborts the Sheets request when the timeout elapses", async () => {
+    vi.useFakeTimers();
+    vi.spyOn(globalThis, "fetch").mockImplementation(
+      (_input: RequestInfo | URL, init?: RequestInit) => {
+        const p = new Promise<Response>((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () => {
+            reject(
+              new DOMException("The operation was aborted.", "AbortError"),
+            );
+          });
+        });
+        // Attach a no-op handler so Node.js does not emit an unhandledRejection
+        // warning before the await in fetchTabs catches the rejection.
+        p.catch((_e) => undefined);
+        return p;
+      },
+    );
+
+    const promise = fetchTabs("sheet-id", "api-key", ["Standings"], {
+      timeoutMs: 100,
+    });
+    // Pre-attach a no-op handler so Node.js does not flag the fetchTabs promise
+    // as unhandled before expect().rejects attaches its own handler.
+    promise.catch((_e) => undefined);
+
+    await vi.advanceTimersByTimeAsync(100);
+
+    await expect(promise).rejects.toThrow("Sheets API request timed out");
+    vi.useRealTimers();
   });
 });

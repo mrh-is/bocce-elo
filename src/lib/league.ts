@@ -1,4 +1,4 @@
-import { expectedScore, processMatches } from "./elo.js";
+import { expectedScore, processMatches, STARTING_RATING } from "./elo.js";
 import { canonicalize, normalize } from "./names.js";
 import {
   parseCanonicalTeams,
@@ -70,8 +70,8 @@ function toUpcomingMatchups(
   return parseMatchupsWithCourts(rows).map((matchup) => {
     const teamA = canonicalize(matchup.teamA, canonicalNames);
     const teamB = canonicalize(matchup.teamB, canonicalNames);
-    const ratingA = ratings[teamA] ?? 1000;
-    const ratingB = ratings[teamB] ?? 1000;
+    const ratingA = ratings[teamA] ?? STARTING_RATING;
+    const ratingB = ratings[teamB] ?? STARTING_RATING;
 
     return {
       teamA,
@@ -97,6 +97,12 @@ function resolveUpcomingMatchups(
     );
   }
 
+  // Auto-detect: walk backward through weeks and return the first week that has
+  // matchup rows with both team names present but blank scores (i.e. not yet played).
+  // Assumes weeks are uploaded to the sheet before scores are entered — a partially
+  // played week (some scores filled in, some blank) will still appear here but its
+  // already-played games will be silently omitted. Set UPCOMING_TAB explicitly in
+  // config.ts to avoid this ambiguity once a season is underway.
   for (let i = weekRowsCache.length - 1; i >= 0; i--) {
     const matchups = toUpcomingMatchups(
       weekRowsCache[i],
@@ -143,17 +149,17 @@ function buildLeaderboard(
   upcomingByTeam: Record<string, UpcomingGame[]>,
   myTeam: string,
 ): LeaderboardEntry[] {
-  return Object.keys(ratings)
-    .sort((a, b) => ratings[b] - ratings[a])
-    .map((name, index) => {
-      const record = records[name] ?? {
-        wins: 0,
-        losses: 0,
-        ties: 0,
-        pointsFor: 0,
-        pointsAgainst: 0,
-      };
-      const eloRank = index + 1;
+  const eloSorted = Object.keys(ratings).sort(
+    (a, b) => ratings[b] - ratings[a],
+  );
+  const eloRankByName = Object.fromEntries(
+    eloSorted.map((name, i) => [name, i + 1]),
+  );
+
+  return eloSorted
+    .map((name) => {
+      const record = records[name];
+      const eloRank = eloRankByName[name];
       const officialRank = officialRankings[name] ?? null;
 
       return {
@@ -164,7 +170,7 @@ function buildLeaderboard(
         elo: ratings[name],
         wins: record.wins,
         losses: record.losses,
-        ties: record.ties ?? 0,
+        ties: record.ties,
         upcoming: upcomingByTeam[normalize(name)] ?? [],
         isMyTeam: name === myTeam,
       };
@@ -207,7 +213,7 @@ export function buildLeaguePageData(
   // Ensure all teams from official standings appear in ratings even if no matches played yet
   for (const name of canonicalNames) {
     if (!(name in ratings)) {
-      ratings[name] = 1000;
+      ratings[name] = STARTING_RATING;
       records[name] = {
         wins: 0,
         losses: 0,
@@ -235,7 +241,7 @@ export function buildLeaguePageData(
       config.myTeam,
     ),
     seasonLabel: config.seasonLabel,
-    lastUpdated: config.now ?? new Date(),
+    lastUpdated: (config.now ?? new Date()).toISOString(),
     sheetUrl: config.sheetUrl,
     myTeam: config.myTeam,
   };

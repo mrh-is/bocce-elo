@@ -30,18 +30,22 @@ describe("marginMultiplier", () => {
   it("returns > 0 for a margin of 1", () => {
     expect(marginMultiplier(21, 20)).toBeGreaterThan(0);
   });
+  it("returns 0 for a margin of 0 (log(1)/log(12) = 0), zeroing out K-factor for exact ties", () => {
+    // scoreA === scoreB is handled before marginMultiplier is called in processMatches,
+    // so this edge is unreachable in practice, but the formula is documented here.
+    expect(marginMultiplier(10, 10)).toBe(0);
+  });
 });
 
 describe("processMatches", () => {
   it("starts every team at 1000", () => {
     const matches = [
       {
+        kind: "scored" as const,
         teamA: "Alpha",
         teamB: "Beta",
         scoreA: 21,
         scoreB: 14,
-        forfeitA: false,
-        forfeitB: false,
       },
     ];
     const { ratings } = processMatches(matches);
@@ -52,12 +56,11 @@ describe("processMatches", () => {
   it("winner gains rating, loser loses", () => {
     const matches = [
       {
+        kind: "scored" as const,
         teamA: "Alpha",
         teamB: "Beta",
         scoreA: 21,
         scoreB: 14,
-        forfeitA: false,
-        forfeitB: false,
       },
     ];
     const { ratings } = processMatches(matches);
@@ -68,20 +71,18 @@ describe("processMatches", () => {
   it("tracks win/loss records correctly", () => {
     const matches = [
       {
+        kind: "scored" as const,
         teamA: "Alpha",
         teamB: "Beta",
         scoreA: 21,
         scoreB: 14,
-        forfeitA: false,
-        forfeitB: false,
       },
       {
+        kind: "scored" as const,
         teamA: "Beta",
         teamB: "Gamma",
         scoreA: 21,
         scoreB: 10,
-        forfeitA: false,
-        forfeitB: false,
       },
     ];
     const { records } = processMatches(matches);
@@ -111,12 +112,10 @@ describe("processMatches", () => {
   it("handles forfeit: winner gets win, no points added to differential", () => {
     const matches = [
       {
+        kind: "forfeit" as const,
         teamA: "Alpha",
         teamB: "Beta",
-        scoreA: null,
-        scoreB: null,
-        forfeitA: true,
-        forfeitB: false,
+        forfeitingTeam: "A" as const,
       },
     ];
     const { records, ratings } = processMatches(matches);
@@ -132,30 +131,27 @@ describe("processMatches", () => {
     // Simple check: no crash and ratings are computed
     const matches = [
       {
+        kind: "scored" as const,
         teamA: "Alpha",
         teamB: "Beta",
         scoreA: 21,
         scoreB: 14,
-        forfeitA: false,
-        forfeitB: false,
         weekIndex: 0,
       },
       {
+        kind: "scored" as const,
         teamA: "Alpha",
         teamB: "Gamma",
         scoreA: 18,
         scoreB: 21,
-        forfeitA: false,
-        forfeitB: false,
         weekIndex: 0,
       },
       {
+        kind: "scored" as const,
         teamA: "Alpha",
         teamB: "Delta",
         scoreA: 21,
         scoreB: 5,
-        forfeitA: false,
-        forfeitB: false,
         weekIndex: 0,
       },
     ];

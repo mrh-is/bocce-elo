@@ -1,12 +1,6 @@
-import type {
-  Match,
-  Ratings,
-  Records,
-  WeeklyRatings,
-  ProcessMatchesResult,
-} from "./types.js";
+import type { Match, Ratings, Records, ProcessMatchesResult } from "./types.js";
 
-const STARTING_RATING = 1000;
+export const STARTING_RATING = 1000;
 const K = 40;
 
 export function expectedScore(ratingA: number, ratingB: number): number {
@@ -21,12 +15,7 @@ export function marginMultiplier(
   return Math.min(Math.log(margin + 1) / Math.log(12), 2.0);
 }
 
-function initTeam(
-  ratings: Ratings,
-  records: Records,
-  weeklyRatings: WeeklyRatings,
-  name: string,
-): void {
+function initTeam(ratings: Ratings, records: Records, name: string): void {
   if (!ratings[name]) {
     ratings[name] = STARTING_RATING;
     records[name] = {
@@ -36,7 +25,6 @@ function initTeam(
       pointsFor: 0,
       pointsAgainst: 0,
     };
-    weeklyRatings[name] = [];
   }
 }
 
@@ -62,63 +50,61 @@ function resolveMatchOutcome(
   match: Match,
   records: Records,
 ): { actualA: number; actualB: number; mult: number } {
-  const { teamA, teamB, scoreA, scoreB, forfeitA, forfeitB } = match;
+  const { teamA, teamB } = match;
 
-  if (forfeitA) {
-    records[teamA].losses++;
-    records[teamB].wins++;
-    return { actualA: 0, actualB: 1, mult: 1.0 };
-  }
-
-  if (forfeitB) {
+  if (match.kind === "forfeit") {
+    if (match.forfeitingTeam === "A") {
+      records[teamA].losses++;
+      records[teamB].wins++;
+      return { actualA: 0, actualB: 1, mult: 1.0 };
+    }
     records[teamA].wins++;
     records[teamB].losses++;
     return { actualA: 1, actualB: 0, mult: 1.0 };
   }
 
+  // TypeScript now knows match is ScoredMatch: scoreA and scoreB are number
+  const { scoreA, scoreB } = match;
+
   if (scoreA === scoreB) {
     records[teamA].ties++;
     records[teamB].ties++;
-    records[teamA].pointsFor += scoreA!;
-    records[teamA].pointsAgainst += scoreB!;
-    records[teamB].pointsFor += scoreB!;
-    records[teamB].pointsAgainst += scoreA!;
+    records[teamA].pointsFor += scoreA;
+    records[teamA].pointsAgainst += scoreB;
+    records[teamB].pointsFor += scoreB;
+    records[teamB].pointsAgainst += scoreA;
     return { actualA: 0.5, actualB: 0.5, mult: 1.0 };
   }
 
-  if (scoreA! > scoreB!) {
+  if (scoreA > scoreB) {
     records[teamA].wins++;
     records[teamB].losses++;
   } else {
     records[teamA].losses++;
     records[teamB].wins++;
   }
-  records[teamA].pointsFor += scoreA!;
-  records[teamA].pointsAgainst += scoreB!;
-  records[teamB].pointsFor += scoreB!;
-  records[teamB].pointsAgainst += scoreA!;
+  records[teamA].pointsFor += scoreA;
+  records[teamA].pointsAgainst += scoreB;
+  records[teamB].pointsFor += scoreB;
+  records[teamB].pointsAgainst += scoreA;
 
   return {
-    actualA: scoreA! > scoreB! ? 1 : 0,
-    actualB: scoreB! > scoreA! ? 1 : 0,
-    mult: marginMultiplier(
-      Math.max(scoreA!, scoreB!),
-      Math.min(scoreA!, scoreB!),
-    ),
+    actualA: scoreA > scoreB ? 1 : 0,
+    actualB: scoreB > scoreA ? 1 : 0,
+    mult: marginMultiplier(Math.max(scoreA, scoreB), Math.min(scoreA, scoreB)),
   };
 }
 
 export function processMatches(matches: Match[]): ProcessMatchesResult {
   const ratings: Ratings = {};
   const records: Records = {};
-  const weeklyRatings: WeeklyRatings = {};
   const weekAppearances: Record<number, Record<string, number>> = {};
 
   for (const match of matches) {
     const { teamA, teamB, weekIndex } = match;
 
-    initTeam(ratings, records, weeklyRatings, teamA);
-    initTeam(ratings, records, weeklyRatings, teamB);
+    initTeam(ratings, records, teamA);
+    initTeam(ratings, records, teamB);
 
     if (weekIndex !== undefined) {
       trackWeekAppearance(weekAppearances, weekIndex, teamA);
@@ -134,10 +120,7 @@ export function processMatches(matches: Match[]): ProcessMatchesResult {
 
     ratings[teamA] = Math.round(rA + K * mult * (actualA - eA));
     ratings[teamB] = Math.round(rB + K * mult * (actualB - eB));
-
-    weeklyRatings[teamA].push(ratings[teamA]);
-    weeklyRatings[teamB].push(ratings[teamB]);
   }
 
-  return { ratings, records, weeklyRatings };
+  return { ratings, records };
 }
