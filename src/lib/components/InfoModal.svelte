@@ -78,11 +78,11 @@
       <section>
         <h3>ELO Rank colors</h3>
         <p>
-          <span class="elo-better">Green Rank</span>
+          <span class="elo-rank elo-better">Green Rank</span>
           — ELO places team higher than official
         </p>
         <p>
-          <span class="elo-worse">Red Rank</span>
+          <span class="elo-rank elo-worse">Red Rank</span>
           — ELO places team lower than official
         </p>
         <p class="note">
@@ -213,17 +213,16 @@
     margin: 0 0.25rem;
     color: var(--text-dim);
   }
-  .elo-better {
-    color: var(--win);
+  .elo-rank {
     font-weight: 700;
     font-family: "Space Mono", monospace;
     font-size: 0.8rem;
   }
+  .elo-better {
+    color: var(--win);
+  }
   .elo-worse {
     color: var(--loss);
-    font-weight: 700;
-    font-family: "Space Mono", monospace;
-    font-size: 0.8rem;
   }
   footer {
     margin-top: 1rem;
@@ -235,8 +234,5 @@
   }
   .footer-line {
     margin: 0.25rem 0;
-    font-size: 0.75rem;
-    color: var(--text-dim);
-    font-family: "Nunito", sans-serif;
   }
 </style>
