@@ -6,20 +6,20 @@
 </script>
 
 <footer>
-  <p>
-    <span class="elo-better">Green ELO #</span>
+  <p class="legend">
+    <span class="elo-better">Green Rank</span>
     = ELO ranks higher than official ·
-    <span class="elo-worse">Red ELO #</span>
+    <span class="elo-worse">Red Rank</span>
     = ELO ranks lower · ELO accounts for score margins
   </p>
-  <p>
+  <p class="meta">
     Updated {new Date(lastUpdated).toLocaleString()} ·
     <a href={sheetUrl} target="_blank" rel="noopener noreferrer">
-      Source Spreadsheet ↗
+      Source Spreadsheet <span class="arrow">↗</span>
     </a>
     ·
     <a href={repoUrl} target="_blank" rel="noopener noreferrer">
-      GitHub Repo ↗
+      GitHub <span class="arrow">↗</span>
     </a>
   </p>
 </footer>
@@ -28,7 +28,8 @@
   footer {
     flex-shrink: 0;
     text-align: center;
-    color: var(--text-dim);
+    color: var(--text-mid);
+    font-family: "Nunito", sans-serif;
     font-size: 0.72rem;
     padding: 0.5rem 0 0.75rem;
     line-height: 1.7;
@@ -39,14 +40,26 @@
   footer a {
     color: var(--accent);
     text-decoration: none;
+    font-weight: 700;
+    white-space: nowrap;
   }
   footer a:hover {
     text-decoration: underline;
   }
+  .arrow {
+    font-family: "Space Mono", monospace;
+  }
   .elo-better {
     color: var(--win);
+    font-weight: 700;
   }
   .elo-worse {
     color: var(--loss);
+    font-weight: 700;
+  }
+  @media (max-width: 600px) {
+    .legend {
+      display: none;
+    }
   }
 </style>

@@ -3,8 +3,6 @@
   import PageHeader from "$lib/components/PageHeader.svelte";
   import SearchBar from "$lib/components/SearchBar.svelte";
   import LeaderboardTable from "$lib/components/LeaderboardTable.svelte";
-  import Footer from "$lib/components/Footer.svelte";
-
   const { data }: { data: PageData } = $props();
 
   let search = $state("");
@@ -26,11 +24,14 @@
   <title>{data.seasonLabel} · Stonewall Bocce ELO</title>
 </svelte:head>
 
-<PageHeader seasonLabel={data.seasonLabel} />
+<PageHeader
+  seasonLabel={data.seasonLabel}
+  lastUpdated={data.lastUpdated}
+  sheetUrl={data.sheetUrl}
+/>
 <SearchBar bind:value={search} />
 <LeaderboardTable
   entries={filtered}
   {hasUpcoming}
   emptyMessage={`No teams match "${search}" 🤷`}
 />
-<Footer lastUpdated={data.lastUpdated} sheetUrl={data.sheetUrl} />

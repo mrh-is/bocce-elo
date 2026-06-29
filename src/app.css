@@ -4,42 +4,144 @@
   box-sizing: border-box;
 }
 
+/* ── Light mode (default) ─────────────────────────────── */
 :root {
-  /* surfaces — green-tinted darks */
-  --surface-0: oklch(16% 0.008 145);
-  --surface-1: oklch(18.5% 0.02 145);
-  --surface-2: oklch(19% 0.013 145);
+  --surface-0: #e8f7e4;
+  --surface-1: #f5fbf3;
+  --surface-2: #eef8ea;
+  --surface-card: #ffffff;
 
-  /* borders */
-  --border: oklch(25.5% 0.03 145);
-  --border-subtle: oklch(20% 0.02 145);
-  --border-muted: oklch(29.5% 0.025 145);
+  --border: #c2e0bb;
+  --border-subtle: #d8eed4;
+  --border-muted: #aacfa3;
 
-  /* accents */
-  --accent: oklch(75.5% 0.127 85);
-  --win: oklch(75.5% 0.125 168);
-  --loss: oklch(57.5% 0.148 30);
+  --accent: #2563eb;
+  --win: #1a8c3c;
+  --loss: #d42b1a;
+  --pallino: #ffd23f;
 
-  /* my-team highlight — very dark gold, derived from accent hue */
-  --surface-my-team: oklch(from var(--accent) 19.5% calc(c * 0.315) h);
-  --border-my-team: oklch(from var(--accent) 23% calc(c * 0.378) h);
+  --surface-my-team: #eef3ff;
+  --border-my-team: #2563eb;
 
-  /* text */
-  --text: oklch(94.5% 0.012 85);
-  --text-heading: oklch(95.5% 0.012 80);
-  --text-sub: oklch(88.5% 0.012 80);
-  --text-dim: oklch(43.5% 0.064 144);
-  --text-mid: oklch(54.5% 0.061 145);
-  --text-light: oklch(65.5% 0.059 145);
+  --text: #1a2e1c;
+  --text-heading: #ffffff;
+  --text-sub: #2c4a2e;
+  --text-dim: #7a9e7e;
+  --text-mid: #4a7050;
+  --text-light: #6b8c70;
+
+  --scrollbar-thumb: #aacfa3;
+  --scrollbar-track: transparent;
+
+  --header-bg: #1e7238;
+  --header-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
 }
 
+/* ── Dark mode ────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --surface-0: #0d1a0f;
+    --surface-1: #122016;
+    --surface-2: #0f1c12;
+    --surface-card: #162019;
+
+    --border: #264030;
+    --border-subtle: #1b2e22;
+    --border-muted: #335040;
+
+    --accent: #60a5fa;
+    --win: #3fd46a;
+    --loss: #ff6055;
+    --pallino: #ffe066;
+
+    --surface-my-team: #0f1e3a;
+    --border-my-team: #60a5fa;
+
+    --text: #e0f0e3;
+    --text-heading: #ffffff;
+    --text-sub: #c0dec4;
+    --text-dim: #4a7050;
+    --text-mid: #7baa80;
+    --text-light: #5a8a60;
+
+    --scrollbar-thumb: #335040;
+    --scrollbar-track: transparent;
+
+    --header-bg: #0f2a14;
+    --header-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+  }
+}
+
+[data-theme="dark"] {
+  --surface-0: #0d1a0f;
+  --surface-1: #122016;
+  --surface-2: #0f1c12;
+  --surface-card: #162019;
+
+  --border: #264030;
+  --border-subtle: #1b2e22;
+  --border-muted: #335040;
+
+  --accent: #60a5fa;
+  --win: #3fd46a;
+  --loss: #ff6055;
+  --pallino: #ffe066;
+
+  --surface-my-team: #0f1e3a;
+  --border-my-team: #60a5fa;
+
+  --text: #e0f0e3;
+  --text-heading: #ffffff;
+  --text-sub: #c0dec4;
+  --text-dim: #4a7050;
+  --text-mid: #7baa80;
+  --text-light: #5a8a60;
+
+  --scrollbar-thumb: #335040;
+  --scrollbar-track: transparent;
+
+  --header-bg: #0f2a14;
+  --header-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="light"] {
+  --surface-0: #e8f7e4;
+  --surface-1: #f5fbf3;
+  --surface-2: #eef8ea;
+  --surface-card: #ffffff;
+  --border: #c2e0bb;
+  --border-subtle: #d8eed4;
+  --border-muted: #aacfa3;
+  --accent: #2563eb;
+  --win: #1a8c3c;
+  --loss: #d42b1a;
+  --pallino: #ffd23f;
+  --surface-my-team: #eef3ff;
+  --border-my-team: #2563eb;
+  --text: #1a2e1c;
+  --text-heading: #ffffff;
+  --text-sub: #2c4a2e;
+  --text-dim: #7a9e7e;
+  --text-mid: #4a7050;
+  --text-light: #6b8c70;
+  --scrollbar-thumb: #aacfa3;
+  --scrollbar-track: transparent;
+
+  --header-bg: #1e7238;
+  --header-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+}
+
+/* ── Base ─────────────────────────────────────────────── */
 body {
   margin: 0;
   background: var(--surface-0);
   color: var(--text);
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: "Nunito", system-ui, sans-serif;
   height: 100dvh;
   overflow: hidden;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 
 .layout {
@@ -49,16 +151,5 @@ body {
   padding: 0 1rem;
   display: flex;
   flex-direction: column;
-}
-
-@media (max-width: 600px) {
-  body {
-    height: auto;
-    overflow: auto;
-  }
-
-  .layout {
-    height: auto;
-    padding-bottom: 2rem;
-  }
+  position: relative;
 }

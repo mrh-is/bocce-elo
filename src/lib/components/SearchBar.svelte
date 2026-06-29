@@ -14,20 +14,28 @@
 <style>
   .search-wrap {
     flex-shrink: 0;
-    margin: 0 0 0.4rem;
+    margin: 0 0 0.5rem;
   }
   input[type="search"] {
     width: 100%;
-    background: var(--surface-2);
-    border: 1px solid var(--border-muted);
-    border-radius: 8px;
+    background: var(--surface-card);
+    border: 2px solid var(--border);
+    border-radius: 100px;
     color: var(--text);
     font-size: 0.95rem;
-    padding: 0.55rem 0.8rem;
+    font-family: "Nunito", sans-serif;
+    padding: 0.5rem 1.1rem;
     outline: none;
-    font-family: inherit;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    transition:
+      border-color 0.15s,
+      box-shadow 0.15s;
   }
   input[type="search"]:focus {
     border-color: var(--accent);
+    box-shadow: 0 2px 10px rgba(255, 77, 139, 0.18);
+  }
+  input[type="search"]::placeholder {
+    color: var(--text-dim);
   }
 </style>

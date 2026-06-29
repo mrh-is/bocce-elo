@@ -27,7 +27,7 @@ export default [
       "no-implied-eval": "error",
       "no-new-func": "error",
       "no-script-url": "error",
-      "prefer-const": "error",
+      "prefer-const": ["error", { destructuring: "all" }],
       "no-var": "error",
       eqeqeq: ["error", "always"],
       curly: ["error", "all"],
