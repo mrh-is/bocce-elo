@@ -1,50 +1,83 @@
 <script lang="ts"></script>
 
 <div class="balls-bg" aria-hidden="true">
+  <!-- Edge peeks: always visible at any width -->
   <div
     class="bocce-ball ball-red"
-    style="width:64px;height:64px;top:-22px;left:-24px;"
-  ></div>
-  <div
-    class="bocce-ball ball-blue"
-    style="width:50px;height:50px;top:12%;right:-18px;"
-  ></div>
-  <div
-    class="bocce-ball ball-white"
-    style="width:28px;height:28px;top:7%;right:8%;"
+    style="width:60px;height:60px;left:-24px;top:7%;"
   ></div>
   <div
     class="bocce-ball ball-green"
-    style="width:72px;height:72px;bottom:-28px;left:-2px;"
+    style="width:50px;height:50px;left:-18px;top:58%;"
+  ></div>
+  <div
+    class="bocce-ball ball-blue"
+    style="width:56px;height:56px;right:-20px;top:15%;"
   ></div>
   <div
     class="bocce-ball ball-yellow"
-    style="width:46px;height:46px;bottom:9%;right:-18px;"
+    style="width:48px;height:48px;right:-16px;top:70%;"
   ></div>
+  <!-- Left margin: visible when side margins appear (~1100px+) -->
   <div
     class="bocce-ball ball-blue"
-    style="width:40px;height:40px;top:52%;left:-16px;"
+    style="width:40px;height:40px;left:5%;top:28%;"
   ></div>
   <div
-    class="bocce-ball ball-red"
-    style="width:32px;height:32px;bottom:20%;left:3%;"
-  ></div>
-  <div
-    class="bocce-ball ball-green"
-    style="width:44px;height:44px;top:38%;right:-14px;"
+    class="bocce-ball ball-yellow"
+    style="width:28px;height:28px;left:9%;top:78%;"
   ></div>
   <div
     class="bocce-ball ball-white"
-    style="width:22px;height:22px;bottom:4%;right:14%;"
+    style="width:24px;height:24px;left:12%;top:44%;"
+  ></div>
+  <div
+    class="bocce-ball ball-red"
+    style="width:44px;height:44px;left:3%;top:93%;"
+  ></div>
+  <!-- Right margin: visible when side margins appear (~1100px+) -->
+  <div
+    class="bocce-ball ball-green"
+    style="width:44px;height:44px;left:88%;top:8%;"
+  ></div>
+  <div
+    class="bocce-ball ball-white"
+    style="width:36px;height:36px;left:91%;top:38%;"
+  ></div>
+  <div
+    class="bocce-ball ball-red"
+    style="width:30px;height:30px;left:87%;top:85%;"
+  ></div>
+  <div
+    class="bocce-ball ball-blue"
+    style="width:26px;height:26px;left:90%;top:55%;"
+  ></div>
+  <!-- Wider margins: visible ~1400px+ -->
+  <div
+    class="bocce-ball ball-green"
+    style="width:36px;height:36px;left:16%;top:17%;"
+  ></div>
+  <div
+    class="bocce-ball ball-blue"
+    style="width:28px;height:28px;left:14%;top:68%;"
+  ></div>
+  <div
+    class="bocce-ball ball-red"
+    style="width:40px;height:40px;left:81%;top:30%;"
+  ></div>
+  <div
+    class="bocce-ball ball-yellow"
+    style="width:30px;height:30px;left:83%;top:76%;"
   ></div>
 </div>
 
 <style>
   .balls-bg {
-    position: absolute;
+    position: fixed;
     inset: 0;
     overflow: hidden;
     pointer-events: none;
+    z-index: -1;
   }
 
   .bocce-ball {
@@ -142,42 +175,50 @@
   .bocce-ball:nth-child(1) {
     animation-delay: 0s;
   }
-
   .bocce-ball:nth-child(2) {
     animation-delay: 0.55s;
   }
-
   .bocce-ball:nth-child(3) {
     animation-delay: 1.1s;
   }
-
   .bocce-ball:nth-child(4) {
     animation-delay: 1.65s;
   }
-
   .bocce-ball:nth-child(5) {
     animation-delay: 2.2s;
   }
-
   .bocce-ball:nth-child(6) {
     animation-delay: 2.75s;
   }
-
   .bocce-ball:nth-child(7) {
     animation-delay: 0.3s;
   }
-
   .bocce-ball:nth-child(8) {
     animation-delay: 0.85s;
   }
-
   .bocce-ball:nth-child(9) {
     animation-delay: 1.4s;
   }
-
-  :global(.layout > :not(.balls-bg)) {
-    position: relative;
-    z-index: 1;
+  .bocce-ball:nth-child(10) {
+    animation-delay: 1.95s;
+  }
+  .bocce-ball:nth-child(11) {
+    animation-delay: 0.2s;
+  }
+  .bocce-ball:nth-child(12) {
+    animation-delay: 0.75s;
+  }
+  .bocce-ball:nth-child(13) {
+    animation-delay: 1.3s;
+  }
+  .bocce-ball:nth-child(14) {
+    animation-delay: 1.85s;
+  }
+  .bocce-ball:nth-child(15) {
+    animation-delay: 2.4s;
+  }
+  .bocce-ball:nth-child(16) {
+    animation-delay: 2.95s;
   }
 
   @media (max-width: 600px) {
