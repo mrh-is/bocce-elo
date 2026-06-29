@@ -181,13 +181,8 @@ describe("fetchTabs", () => {
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const url = new URL(fetchMock.mock.calls[0][0] as string);
-    expect(url.pathname).toBe(
-      "/v4/spreadsheets/sheet-id/values:batchGet",
-    );
-    expect(url.searchParams.getAll("ranges")).toEqual([
-      "Standings",
-      "Week 1",
-    ]);
+    expect(url.pathname).toBe("/v4/spreadsheets/sheet-id/values:batchGet");
+    expect(url.searchParams.getAll("ranges")).toEqual(["Standings", "Week 1"]);
     expect(url.searchParams.get("key")).toBe("api-key");
     expect(rowsByTab).toEqual({
       Standings: [["standings"]],

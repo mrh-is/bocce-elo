@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { buildLeaguePageData } from "../lib/league.js";
 
 const baseConfig = {
@@ -83,5 +83,24 @@ describe("buildLeaguePageData", () => {
         court: "1",
       },
     ]);
+  });
+
+  it("does not call fetch while transforming rows into page data", () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch");
+
+    buildLeaguePageData(
+      {
+        Standings: [
+          ["", "RANKING", "", "TEAM"],
+          ["", "1", "", "Alpha"],
+          ["", "2", "", "Beta"],
+        ],
+        "Week 1": [["", "1", "Alpha", "21", "Beta", "11"]],
+        "Week 2": [["", "1", "Alpha", "", "Beta", ""]],
+      },
+      baseConfig,
+    );
+
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });
