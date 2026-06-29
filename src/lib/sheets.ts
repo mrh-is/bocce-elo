@@ -92,13 +92,10 @@ export function parseMatchTab(rows: string[][]): Match[] {
   return matches;
 }
 
-export async function getCanonicalTeams(
-  sheetId: string,
-  apiKey: string,
-  summaryTab: string,
+export function parseCanonicalTeams(
+  rows: string[][],
   nameCol: number,
-): Promise<string[]> {
-  const rows = await fetchTab(sheetId, apiKey, summaryTab);
+): string[] {
   const names = new Set<string>();
   for (const row of rows.slice(1)) {
     const name = row[nameCol]?.trim();
@@ -109,14 +106,11 @@ export async function getCanonicalTeams(
   return [...names];
 }
 
-export async function getOfficialRankings(
-  sheetId: string,
-  apiKey: string,
-  summaryTab: string,
+export function parseOfficialRankings(
+  rows: string[][],
   nameCol: number,
   rankCol: number,
-): Promise<OfficialRankings> {
-  const rows = await fetchTab(sheetId, apiKey, summaryTab);
+): OfficialRankings {
   const rankings: OfficialRankings = {};
   for (const row of rows.slice(1)) {
     const name = row[nameCol]?.trim();
@@ -126,6 +120,27 @@ export async function getOfficialRankings(
     }
   }
   return rankings;
+}
+
+export async function getCanonicalTeams(
+  sheetId: string,
+  apiKey: string,
+  summaryTab: string,
+  nameCol: number,
+): Promise<string[]> {
+  const rows = await fetchTab(sheetId, apiKey, summaryTab);
+  return parseCanonicalTeams(rows, nameCol);
+}
+
+export async function getOfficialRankings(
+  sheetId: string,
+  apiKey: string,
+  summaryTab: string,
+  nameCol: number,
+  rankCol: number,
+): Promise<OfficialRankings> {
+  const rows = await fetchTab(sheetId, apiKey, summaryTab);
+  return parseOfficialRankings(rows, nameCol, rankCol);
 }
 
 export function parseScheduledMatch(

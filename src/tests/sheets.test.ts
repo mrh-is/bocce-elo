@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { parseMatch, parseMatchTab } from "../lib/sheets.js";
+import {
+  parseMatch,
+  parseMatchTab,
+  parseCanonicalTeams,
+  parseOfficialRankings,
+} from "../lib/sheets.js";
 
 describe("parseMatch", () => {
   it("parses a normal game from left block (colOffset=0)", () => {
@@ -116,5 +121,36 @@ describe("parseMatchTab", () => {
   it("skips a block when both score cells are blank", () => {
     const rows = [["", "1", "Alpha", "", "Beta", ""]];
     expect(parseMatchTab(rows)).toHaveLength(0);
+  });
+});
+
+describe("parseCanonicalTeams", () => {
+  it("returns unique trimmed names from the configured column after the header", () => {
+    const rows = [
+      ["", "RANKING", "", "TEAM"],
+      ["", "1", "", " Alpha "],
+      ["", "2", "", "Beta"],
+      ["", "3", "", "Alpha"],
+      ["", "4", "", ""],
+    ];
+
+    expect(parseCanonicalTeams(rows, 3)).toEqual(["Alpha", "Beta"]);
+  });
+});
+
+describe("parseOfficialRankings", () => {
+  it("maps team names to numeric ranks and skips invalid rows", () => {
+    const rows = [
+      ["", "RANKING", "", "TEAM"],
+      ["", "1", "", "Alpha"],
+      ["", "2", "", " Beta "],
+      ["", "not-a-rank", "", "Gamma"],
+      ["", "4", "", ""],
+    ];
+
+    expect(parseOfficialRankings(rows, 3, 1)).toEqual({
+      Alpha: 1,
+      Beta: 2,
+    });
   });
 });
