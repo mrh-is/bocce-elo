@@ -1,0 +1,19 @@
+#!/bin/sh
+set -eu
+
+before_format="$(mktemp)"
+after_format="$(mktemp)"
+trap 'rm -f "$before_format" "$after_format"' EXIT
+
+git diff --binary > "$before_format"
+
+npm run precommit
+
+git diff --binary > "$after_format"
+
+if ! cmp -s "$before_format" "$after_format"; then
+  echo
+  echo "Pre-commit formatting changed files."
+  echo "Review and stage the formatting updates, then commit again."
+  exit 1
+fi
