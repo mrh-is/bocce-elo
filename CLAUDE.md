@@ -26,10 +26,11 @@ SvelteKit app deployed to Cloudflare Pages (`@sveltejs/adapter-cloudflare`). The
 4. Computes ELO ratings via `elo.ts`
 5. Returns a `PageData` object to the Svelte page
 
-**5-minute in-memory cache** is held in the server module scope (resets on redeploy).
+**5-minute in-memory cache** with single-flight deduplication (concurrent stale requests share one fetch) is held in the server module scope (resets on redeploy).
 
 ## Key files
 
+- **`src/routes/+page.server.ts`** — SvelteKit server load function. Fetches all required tabs, builds `PageData`, and manages a 5-minute in-memory cache with single-flight deduplication. Exports `__testing.expireCache()` for tests.
 - **`src/lib/config.ts`** — Season configuration. Update `WEEK_TABS`, `UPCOMING_TAB`, `SEASON_LABEL`, `MY_TEAM`, and column constants each season.
 - **`src/lib/names.ts`** — `ALIASES` map for truncated/misspelled team names from the sheet. `normalize()` strips punctuation/case; `canonicalize()` resolves to the official name.
 - **`src/lib/sheets.ts`** — Google Sheets fetch + row parsing. Column layout is documented in a comment at the top. `parseMatch(row, colOffset)` handles both left (offset=1) and right (offset=6) match blocks per row.

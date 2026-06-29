@@ -1,5 +1,3 @@
-const SHEET_ID = "1vhfcIsIHrt4-U11LdutPz5hfxfjdBhEPFaLXMZz0KRs";
-
 export const SEASON_LABEL = "Season 10";
 
 export const SUMMARY_TAB = "Standings";
@@ -23,6 +21,7 @@ export const UPCOMING_TAB: string | null = "Week 8";
 export const RANKINGS_NAME_COL = 3;
 export const RANKINGS_RANK_COL = 1;
 
-export const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}`;
+export const SHEET_URL =
+  "https://docs.google.com/spreadsheets/d/1vhfcIsIHrt4-U11LdutPz5hfxfjdBhEPFaLXMZz0KRs";
 
 export const MY_TEAM = "Walter and the Bocce Bunch";
