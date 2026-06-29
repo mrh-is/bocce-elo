@@ -39,13 +39,16 @@ function parseMatchesByWeek(
   rowsByTab: RowsByTab,
   weekTabs: string[],
   canonicalNames: string[],
-): { allMatches: Match[]; weekRowsCache: { weekIndex: number; rows: string[][] }[] } {
+): {
+  allMatches: Match[];
+  weekRowsCache: string[][][];
+} {
   const allMatches: Match[] = [];
-  const weekRowsCache: { weekIndex: number; rows: string[][] }[] = [];
+  const weekRowsCache: string[][][] = [];
 
   for (let i = 0; i < weekTabs.length; i++) {
     const rows = rowsByTab[weekTabs[i]] ?? [];
-    weekRowsCache.push({ weekIndex: i, rows });
+    weekRowsCache.push(rows);
     allMatches.push(
       ...parseMatchTab(rows).map((match) => ({
         ...match,
@@ -82,7 +85,7 @@ function toUpcomingMatchups(
 function resolveUpcomingMatchups(
   rowsByTab: RowsByTab,
   config: LeaguePageConfig,
-  weekRowsCache: { weekIndex: number; rows: string[][] }[],
+  weekRowsCache: string[][][],
   ratings: Ratings,
   canonicalNames: string[],
 ): UpcomingMatchup[] {
@@ -96,7 +99,7 @@ function resolveUpcomingMatchups(
 
   for (let i = weekRowsCache.length - 1; i >= 0; i--) {
     const matchups = toUpcomingMatchups(
-      weekRowsCache[i].rows,
+      weekRowsCache[i],
       ratings,
       canonicalNames,
     );
@@ -161,7 +164,7 @@ function buildLeaderboard(
         elo: ratings[name],
         wins: record.wins,
         losses: record.losses,
-        ties: record.ties,
+        ties: record.ties ?? 0,
         upcoming: upcomingByTeam[normalize(name)] ?? [],
         isMyTeam: name === myTeam,
       };
@@ -185,7 +188,10 @@ export function buildLeaguePageData(
   config: LeaguePageConfig,
 ): PageData {
   const summaryRows = rowsByTab[config.summaryTab] ?? [];
-  const canonicalNames = parseCanonicalTeams(summaryRows, config.rankingsNameCol);
+  const canonicalNames = parseCanonicalTeams(
+    summaryRows,
+    config.rankingsNameCol,
+  );
   const officialRankings = parseOfficialRankings(
     summaryRows,
     config.rankingsNameCol,

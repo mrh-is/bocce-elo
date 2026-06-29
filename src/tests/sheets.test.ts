@@ -4,7 +4,6 @@ import {
   parseMatchTab,
   parseCanonicalTeams,
   parseOfficialRankings,
-  fetchTab,
   fetchTabs,
 } from "../lib/sheets.js";
 
@@ -208,21 +207,6 @@ describe("fetchTabs", () => {
       fetchTabs("sheet-id", "api-key", ["Standings", "Week 1"]),
     ).rejects.toThrow(
       'Sheets API error for tabs "Standings", "Week 1": 403 Forbidden',
-    );
-  });
-});
-
-describe("fetchTab", () => {
-  it("uses the batch fetcher shape for one tab", async () => {
-    vi.spyOn(globalThis, "fetch").mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        valueRanges: [{ range: "Standings!A1:Z", values: [["row"]] }],
-      }),
-    } as Response);
-
-    await expect(fetchTab("sheet-id", "api-key", "Standings")).resolves.toEqual(
-      [["row"]],
     );
   });
 });

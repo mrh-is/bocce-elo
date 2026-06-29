@@ -1,9 +1,4 @@
-import type {
-  Match,
-  MatchupWithCourt,
-  ScheduledMatch,
-  OfficialRankings,
-} from "./types.js";
+import type { Match, MatchupWithCourt, OfficialRankings } from "./types.js";
 
 // Spreadsheet row layout (0-indexed columns):
 // | 0:blank | 1:court | 2:teamA | 3:scoreA | 4:teamB | 5:scoreB | 6:blank | 7:teamA2 | 8:scoreA2 | 9:teamB2 | 10:scoreB2 |
@@ -67,15 +62,6 @@ export async function fetchTabs(
       valueRanges[index]?.values ?? [],
     ]),
   );
-}
-
-export async function fetchTab(
-  sheetId: string,
-  apiKey: string,
-  tabName: string,
-): Promise<string[][]> {
-  const rowsByTab = await fetchTabs(sheetId, apiKey, [tabName]);
-  return rowsByTab[tabName] ?? [];
 }
 
 export function parseMatch(row: string[], colOffset: number): Match | null {
@@ -155,44 +141,6 @@ export function parseOfficialRankings(
   return rankings;
 }
 
-export async function getCanonicalTeams(
-  sheetId: string,
-  apiKey: string,
-  summaryTab: string,
-  nameCol: number,
-): Promise<string[]> {
-  const rows = await fetchTab(sheetId, apiKey, summaryTab);
-  return parseCanonicalTeams(rows, nameCol);
-}
-
-export async function getOfficialRankings(
-  sheetId: string,
-  apiKey: string,
-  summaryTab: string,
-  nameCol: number,
-  rankCol: number,
-): Promise<OfficialRankings> {
-  const rows = await fetchTab(sheetId, apiKey, summaryTab);
-  return parseOfficialRankings(rows, nameCol, rankCol);
-}
-
-export function parseScheduledMatch(
-  row: string[],
-  colOffset: number,
-): ScheduledMatch | null {
-  const teamA = row[colOffset + MATCH_COLS.TEAM_A]?.trim();
-  const teamB = row[colOffset + MATCH_COLS.TEAM_B]?.trim();
-  if (!teamA || !teamB) {
-    return null;
-  }
-  const rawA = row[colOffset + MATCH_COLS.SCORE_A]?.trim() ?? "";
-  const rawB = row[colOffset + MATCH_COLS.SCORE_B]?.trim() ?? "";
-  if (!rawA && !rawB) {
-    return { teamA, teamB };
-  }
-  return null;
-}
-
 export function parseMatchupsWithCourts(rows: string[][]): MatchupWithCourt[] {
   const game1: MatchupWithCourt[] = [];
   const game2: MatchupWithCourt[] = [];
@@ -213,22 +161,4 @@ export function parseMatchupsWithCourts(rows: string[][]): MatchupWithCourt[] {
     }
   }
   return [...game1, ...game2];
-}
-
-export function parseScheduledMatchTab(rows: string[][]): ScheduledMatch[] {
-  const matches: ScheduledMatch[] = [];
-  for (const row of rows) {
-    if (!row || row.length < 2) {
-      continue;
-    }
-    const left = parseScheduledMatch(row, 1);
-    if (left) {
-      matches.push(left);
-    }
-    const right = parseScheduledMatch(row, 6);
-    if (right) {
-      matches.push(right);
-    }
-  }
-  return matches;
 }

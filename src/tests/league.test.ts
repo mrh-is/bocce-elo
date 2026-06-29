@@ -85,6 +85,32 @@ describe("buildLeaguePageData", () => {
     ]);
   });
 
+  it("includes teams in standings that have no completed matches at 1000 ELO with 0-0-0 record", () => {
+    const pageData = buildLeaguePageData(
+      {
+        Standings: [
+          ["", "RANKING", "", "TEAM"],
+          ["", "1", "", "Alpha"],
+          ["", "2", "", "Beta"],
+          ["", "3", "", "Gamma"],
+        ],
+        "Week 1": [["", "1", "Alpha", "21", "Beta", "11"]],
+        "Week 2": [],
+      },
+      baseConfig,
+    );
+
+    const gamma = pageData.leaderboard.find((t) => t.name === "Gamma");
+    expect(gamma).toMatchObject({
+      name: "Gamma",
+      elo: 1000,
+      wins: 0,
+      losses: 0,
+      ties: 0,
+      officialRank: 3,
+    });
+  });
+
   it("does not call fetch while transforming rows into page data", () => {
     const fetchMock = vi.spyOn(globalThis, "fetch");
 
