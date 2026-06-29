@@ -1,11 +1,14 @@
 <script lang="ts">
+  import ExternalLink from "./ExternalLink.svelte";
+  import RelativeTime from "./RelativeTime.svelte";
+
   let {
     open = $bindable(false),
     lastUpdated,
     sheetUrl,
-  }: { open: boolean; lastUpdated: string; sheetUrl: string } = $props();
+  }: { open: boolean; lastUpdated: Date; sheetUrl: string } = $props();
 
-  const repoUrl = "https://github.com/mrh-is/bocce-elo";
+  const issuesUrl = "https://github.com/mrh-is/bocce-elo/issues/new";
 
   function close() {
     open = false;
@@ -85,20 +88,27 @@
         <p class="note">
           ELO accounts for score margins, not just wins and losses.
         </p>
+        <p class="note">
+          Learn about ELO:
+          <ExternalLink href="https://en.wikipedia.org/wiki/Elo_rating_system">
+            Wikipedia
+          </ExternalLink>
+          <span class="sep">·</span>
+          <ExternalLink href="https://www.youtube.com/watch?v=inXUp5j107I">
+            Explainer video
+          </ExternalLink>
+        </p>
       </section>
 
       <footer>
-        <a href={sheetUrl} target="_blank" rel="noopener noreferrer">
-          Source Spreadsheet <span class="arrow">↗</span>
-        </a>
-        <span class="sep">·</span>
-        <a href={repoUrl} target="_blank" rel="noopener noreferrer">
-          GitHub <span class="arrow">↗</span>
-        </a>
-        <br />
-        <span class="updated">
-          Updated {new Date(lastUpdated).toLocaleString()}
-        </span>
+        <p class="footer-line">
+          Questions, comments, suggestions, praise, curiosity?
+          <ExternalLink href={issuesUrl}>Add an issue on GitHub</ExternalLink>
+        </p>
+        <p class="footer-line">
+          Data last updated <RelativeTime date={lastUpdated} /> from
+          <ExternalLink href={sheetUrl}>the official source</ExternalLink>
+        </p>
       </footer>
     </div>
   </div>
@@ -199,6 +209,10 @@
     color: var(--text-dim);
     margin-top: 0.4rem;
   }
+  .sep {
+    margin: 0 0.25rem;
+    color: var(--text-dim);
+  }
   .elo-better {
     color: var(--win);
     font-weight: 700;
@@ -219,24 +233,10 @@
     font-family: "Nunito", sans-serif;
     color: var(--text-dim);
   }
-  footer a {
-    color: var(--accent);
-    text-decoration: none;
-    font-weight: 700;
-  }
-  footer a:hover {
-    text-decoration: underline;
-  }
-  .arrow {
-    font-family: "Space Mono", monospace;
-  }
-  .sep {
-    margin: 0 0.35rem;
-    color: var(--border-muted);
-  }
-  .updated {
-    display: inline-block;
-    margin-top: 0.3rem;
-    font-size: 0.7rem;
+  .footer-line {
+    margin: 0.25rem 0;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    font-family: "Nunito", sans-serif;
   }
 </style>

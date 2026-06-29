@@ -6,7 +6,7 @@
     seasonLabel,
     lastUpdated,
     sheetUrl,
-  }: { seasonLabel: string; lastUpdated: string; sheetUrl: string } = $props();
+  }: { seasonLabel: string; lastUpdated: Date; sheetUrl: string } = $props();
 
   let infoOpen = $state(false);
 </script>

@@ -235,7 +235,7 @@ export function buildLeaguePageData(
       config.myTeam,
     ),
     seasonLabel: config.seasonLabel,
-    lastUpdated: (config.now ?? new Date()).toISOString(),
+    lastUpdated: config.now ?? new Date(),
     sheetUrl: config.sheetUrl,
     myTeam: config.myTeam,
   };

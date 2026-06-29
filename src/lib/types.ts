@@ -60,7 +60,7 @@ export interface LeaderboardEntry {
 export interface PageData {
   leaderboard: LeaderboardEntry[];
   seasonLabel: string;
-  lastUpdated: string;
+  lastUpdated: Date;
   sheetUrl: string;
   myTeam: string;
 }
