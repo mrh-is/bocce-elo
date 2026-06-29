@@ -12,15 +12,15 @@
 </script>
 
 <header>
-  <div class="header-controls">
-    <button
-      class="info-btn"
-      onclick={() => (infoOpen = true)}
-      aria-label="How to read this"
-      title="How to read this"
-    >
-      ?
-    </button>
+  <button
+    class="info-btn"
+    onclick={() => (infoOpen = true)}
+    aria-label="How to read this"
+    title="How to read this"
+  >
+    ?
+  </button>
+  <div class="theme-controls">
     <ThemeSwitcher />
   </div>
   <h1>Stonewall Bocce</h1>
@@ -45,15 +45,17 @@
       background 0.2s,
       box-shadow 0.2s;
   }
-  .header-controls {
+  .theme-controls {
     position: absolute;
     top: 0.65rem;
     right: 0.85rem;
     display: flex;
     align-items: center;
-    gap: 0.4rem;
   }
   .info-btn {
+    position: absolute;
+    top: 0.65rem;
+    left: 0.85rem;
     background: rgba(0, 0, 0, 0.25);
     border: none;
     cursor: pointer;
@@ -86,6 +88,11 @@
     margin: 0;
     color: #ffffff;
     line-height: 1;
+  }
+  @media (max-width: 650px) {
+    h1 {
+      margin-top: 1.2rem;
+    }
   }
   .season-label {
     margin: 0.45rem 0 0;
