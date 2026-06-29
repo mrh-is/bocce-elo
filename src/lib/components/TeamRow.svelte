@@ -7,11 +7,27 @@
     hasUpcoming,
   }: { team: LeaderboardEntry; hasUpcoming: boolean } = $props();
 
-  function rankDiffClass(diff: number | null): string {
+  function compareDiff(
+    diff: number | null,
+    greaterText: string,
+    lessText: string,
+  ): string {
     if (diff === null || diff === 0) {
       return "";
     }
-    return diff > 0 ? "elo-better" : "elo-worse";
+    return diff > 0 ? greaterText : lessText;
+  }
+
+  function rankDiffClass(diff: number | null): string {
+    return compareDiff(diff, "elo-better", "elo-worse");
+  }
+
+  function hoverText(diff: number | null): string {
+    return compareDiff(
+      diff,
+      `ELO ranks ${diff} spots higher than official`,
+      `ELO ranks ${Math.abs(diff!)} spots lower than official`,
+    );
   }
 </script>
 
@@ -19,16 +35,14 @@
   <td class="num official">{team.officialRank ?? "–"}</td>
   <td
     class="num rank {rankDiffClass(team.rankDiff)}"
-    title={team.rankDiff !== null && team.rankDiff !== 0
-      ? team.rankDiff > 0
-        ? `ELO ranks ${team.rankDiff} spots higher than official`
-        : `ELO ranks ${Math.abs(team.rankDiff)} spots lower than official`
-      : ""}>{team.rank}</td
+    title={hoverText(team.rankDiff)}
   >
-  <td class="name"
-    >{#if team.isMyTeam}🐕
-    {/if}{team.name}</td
-  >
+    {team.rank}
+  </td>
+  <td class="name">
+    {#if team.isMyTeam}🐕{/if}
+    {team.name}
+  </td>
   <td class="num elo">{team.elo}</td>
   <td class="num">{team.wins}</td>
   <td class="num">{team.losses}</td>
@@ -42,53 +56,53 @@
 
 <style>
   tr:hover {
-    background: #0d150d;
+    background: var(--surface-1);
   }
   tr.my-team {
-    background: #1a1500 !important;
-    box-shadow: inset 3px 0 0 #d4a843;
+    background: var(--surface-my-team) !important;
+    box-shadow: inset 3px 0 0 var(--accent);
   }
   td {
     padding: 0.55rem 0.7rem;
-    border-top: 1px solid #111911;
+    border-top: 1px solid var(--border-subtle);
     vertical-align: middle;
   }
   tr.my-team td {
-    border-top-color: #221d00;
+    border-top-color: var(--border-my-team);
   }
   .num {
     text-align: right;
   }
   .rank {
-    color: #3a5a3a;
+    color: var(--text-dim);
     font-size: 0.82rem;
   }
   .rank.elo-better {
-    color: #4fc9a0;
+    color: var(--win);
     font-weight: 600;
   }
   .rank.elo-worse {
-    color: #c05040;
+    color: var(--loss);
     font-weight: 600;
   }
   .name {
     font-weight: 600;
-    color: #ddd8d0;
+    color: var(--text-sub);
   }
   tr.my-team .name {
-    color: #d4a843;
+    color: var(--accent);
   }
   .elo {
     font-weight: 700;
-    color: #4fc9a0;
+    color: var(--win);
     font-variant-numeric: tabular-nums;
   }
   .ties {
-    color: #3a5a3a;
+    color: var(--text-dim);
   }
   .official {
     font-variant-numeric: tabular-nums;
-    color: #5a7a5a;
+    color: var(--text-mid);
   }
   .this-wk {
     padding-left: 1rem;

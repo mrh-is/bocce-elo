@@ -4,10 +4,39 @@
   box-sizing: border-box;
 }
 
+:root {
+  /* surfaces — green-tinted darks */
+  --surface-0: oklch(16% 0.008 145);
+  --surface-1: oklch(18.5% 0.02 145);
+  --surface-2: oklch(19% 0.013 145);
+
+  /* borders */
+  --border: oklch(25.5% 0.03 145);
+  --border-subtle: oklch(20% 0.02 145);
+  --border-muted: oklch(29.5% 0.025 145);
+
+  /* accents */
+  --accent: oklch(75.5% 0.127 85);
+  --win: oklch(75.5% 0.125 168);
+  --loss: oklch(57.5% 0.148 30);
+
+  /* my-team highlight — very dark gold, derived from accent hue */
+  --surface-my-team: oklch(from var(--accent) 19.5% calc(c * 0.315) h);
+  --border-my-team: oklch(from var(--accent) 23% calc(c * 0.378) h);
+
+  /* text */
+  --text: oklch(94.5% 0.012 85);
+  --text-heading: oklch(95.5% 0.012 80);
+  --text-sub: oklch(88.5% 0.012 80);
+  --text-dim: oklch(43.5% 0.064 144);
+  --text-mid: oklch(54.5% 0.061 145);
+  --text-light: oklch(65.5% 0.059 145);
+}
+
 body {
   margin: 0;
-  background: #0b0e0b;
-  color: #f0ece4;
+  background: var(--surface-0);
+  color: var(--text);
   font-family: "Inter", system-ui, sans-serif;
   height: 100dvh;
   overflow: hidden;

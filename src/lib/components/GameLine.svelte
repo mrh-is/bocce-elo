@@ -26,30 +26,30 @@
   }
   .court {
     font-size: 0.7rem;
-    color: #d4a843;
+    color: var(--accent);
     text-align: right;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
   .opp {
     font-size: 0.78rem;
-    color: #7a9a7a;
+    color: var(--text-light);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
   .odds-fav {
-    color: #4fc9a0;
+    color: var(--win);
     font-weight: 700;
     font-size: 0.82rem;
     font-variant-numeric: tabular-nums;
   }
   .odds-dog {
-    color: #5a7a5a;
+    color: var(--text-mid);
     font-size: 0.82rem;
     font-variant-numeric: tabular-nums;
   }
   .muted {
-    color: #253025;
+    color: var(--border-muted);
   }
 </style>

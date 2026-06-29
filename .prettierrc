@@ -15,6 +15,7 @@
       "options": {
         "parser": "svelte",
         "bracketSameLine": false,
+        "htmlWhitespaceSensitivity": "ignore",
         "svelteSortOrder": "options-scripts-markup-styles",
         "svelteAllowShorthand": true,
         "svelteIndentScriptAndStyle": true

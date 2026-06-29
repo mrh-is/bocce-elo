@@ -24,25 +24,13 @@
 
 <svelte:head>
   <title>{data.seasonLabel} · Stonewall Bocce ELO</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link
-    rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin="anonymous"
-  />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&display=swap"
-    rel="stylesheet"
-  />
 </svelte:head>
 
-<div class="layout">
-  <PageHeader seasonLabel={data.seasonLabel} />
-  <SearchBar bind:value={search} />
-  <LeaderboardTable
-    entries={filtered}
-    {hasUpcoming}
-    emptyMessage={`No teams match "${search}" 🤷`}
-  />
-  <Footer lastUpdated={data.lastUpdated} sheetUrl={data.sheetUrl} />
-</div>
+<PageHeader seasonLabel={data.seasonLabel} />
+<SearchBar bind:value={search} />
+<LeaderboardTable
+  entries={filtered}
+  {hasUpcoming}
+  emptyMessage={`No teams match "${search}" 🤷`}
+/>
+<Footer lastUpdated={data.lastUpdated} sheetUrl={data.sheetUrl} />

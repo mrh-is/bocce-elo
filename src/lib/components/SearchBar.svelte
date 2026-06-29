@@ -18,16 +18,16 @@
   }
   input[type="search"] {
     width: 100%;
-    background: #101510;
-    border: 1px solid #253025;
+    background: var(--surface-2);
+    border: 1px solid var(--border-muted);
     border-radius: 8px;
-    color: #f0ece4;
+    color: var(--text);
     font-size: 0.95rem;
     padding: 0.55rem 0.8rem;
     outline: none;
     font-family: inherit;
   }
   input[type="search"]:focus {
-    border-color: #d4a843;
+    border-color: var(--accent);
   }
 </style>

@@ -46,7 +46,7 @@
     min-height: 0;
     overflow-y: auto;
     border-radius: 10px;
-    border: 1px solid #1a271a;
+    border: 1px solid var(--border);
   }
   table {
     width: 100%;
@@ -54,18 +54,18 @@
     font-size: 0.88rem;
   }
   thead {
-    background: #0d150d;
+    background: var(--surface-1);
   }
   thead th {
     position: sticky;
     top: 0;
     z-index: 1;
-    background: #0d150d;
+    background: var(--surface-1);
   }
   th {
     padding: 0.6rem 0.7rem;
     text-align: left;
-    color: #d4a843;
+    color: var(--accent);
     font-weight: 600;
     font-size: 0.68rem;
     text-transform: uppercase;
@@ -81,9 +81,9 @@
   }
   .empty {
     text-align: center;
-    color: #3a5a3a;
+    color: var(--text-dim);
     padding: 2rem;
-    border-top: 1px solid #111911;
+    border-top: 1px solid var(--border-subtle);
     vertical-align: middle;
   }
   @media (max-width: 600px) {

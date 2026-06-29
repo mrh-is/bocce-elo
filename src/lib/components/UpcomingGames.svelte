@@ -15,6 +15,6 @@
 
 <style>
   .muted {
-    color: #253025;
+    color: var(--border-muted);
   }
 </style>
