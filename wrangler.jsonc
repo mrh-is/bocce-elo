@@ -1,0 +1,4 @@
+{
+  "name": "bocce-elo",
+  "compatibility_flags": ["nodejs_als"],
+}
