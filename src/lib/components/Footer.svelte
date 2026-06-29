@@ -1,5 +1,5 @@
 <script lang="ts">
-  const { lastUpdated, sheetUrl }: { lastUpdated: string; sheetUrl: string } =
+  const { lastUpdated, sheetUrl }: { lastUpdated: Date; sheetUrl: string } =
     $props();
 
   const repoUrl = "https://github.com/mrh-is/bocce-elo";
@@ -13,7 +13,7 @@
     = ELO ranks lower · ELO accounts for score margins
   </p>
   <p class="meta">
-    Updated {new Date(lastUpdated).toLocaleString()} ·
+    Updated {lastUpdated.toLocaleString()} ·
     <a href={sheetUrl} target="_blank" rel="noopener noreferrer">
       Source Spreadsheet <span class="arrow">↗</span>
     </a>

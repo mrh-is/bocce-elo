@@ -34,7 +34,7 @@ describe("buildLeaguePageData", () => {
 
     expect(pageData).toMatchObject({
       seasonLabel: "Season Test",
-      lastUpdated: "2026-06-29T12:00:00.000Z",
+      lastUpdated: new Date("2026-06-29T12:00:00.000Z"),
       sheetUrl: "https://example.test/sheet",
       myTeam: "Alpha",
     });

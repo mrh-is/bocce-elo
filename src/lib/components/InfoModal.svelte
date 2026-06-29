@@ -6,7 +6,7 @@
     open = $bindable(false),
     lastUpdated,
     sheetUrl,
-  }: { open: boolean; lastUpdated: string; sheetUrl: string } = $props();
+  }: { open: boolean; lastUpdated: Date; sheetUrl: string } = $props();
 
   const issuesUrl = "https://github.com/mrh-is/bocce-elo/issues/new";
 

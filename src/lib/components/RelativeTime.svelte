@@ -1,8 +1,7 @@
 <script lang="ts">
-  const { date }: { date: string } = $props();
+  const { date }: { date: Date } = $props();
 
-  const parsedDate = $derived(new Date(date));
-  const exactTimestamp = $derived(parsedDate.toLocaleString());
+  const exactTimestamp = $derived(date.toLocaleString());
 
   function relativeTime(from: Date, now: number): string {
     const diff = Math.floor((now - from.getTime()) / 1000);
@@ -28,7 +27,7 @@
   }
 
   let now = $state(Date.now());
-  const text = $derived(relativeTime(parsedDate, now));
+  const text = $derived(relativeTime(date, now));
 
   $effect(() => {
     const interval = setInterval(() => {
