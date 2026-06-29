@@ -1,10 +1,16 @@
-import { describe, it, expect } from "vitest";
+import { afterEach, describe, it, expect, vi } from "vitest";
 import {
   parseMatch,
   parseMatchTab,
   parseCanonicalTeams,
   parseOfficialRankings,
+  fetchTab,
+  fetchTabs,
 } from "../lib/sheets.js";
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("parseMatch", () => {
   it("parses a normal game from left block (colOffset=0)", () => {
@@ -152,5 +158,76 @@ describe("parseOfficialRankings", () => {
       Alpha: 1,
       Beta: 2,
     });
+  });
+});
+
+describe("fetchTabs", () => {
+  it("fetches multiple unique tabs with one batchGet request", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        valueRanges: [
+          { range: "Standings!A1:Z", values: [["standings"]] },
+          { range: "'Week 1'!A1:Z", values: [["week1"]] },
+        ],
+      }),
+    } as Response);
+
+    const rowsByTab = await fetchTabs("sheet-id", "api-key", [
+      "Standings",
+      "Week 1",
+      "Week 1",
+    ]);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const url = new URL(fetchMock.mock.calls[0][0] as string);
+    expect(url.pathname).toBe(
+      "/v4/spreadsheets/sheet-id/values:batchGet",
+    );
+    expect(url.searchParams.getAll("ranges")).toEqual([
+      "Standings",
+      "Week 1",
+    ]);
+    expect(url.searchParams.get("key")).toBe("api-key");
+    expect(rowsByTab).toEqual({
+      Standings: [["standings"]],
+      "Week 1": [["week1"]],
+    });
+  });
+
+  it("returns an empty map without calling fetch when no tabs are requested", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch");
+
+    await expect(fetchTabs("sheet-id", "api-key", [])).resolves.toEqual({});
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("throws a helpful error when batchGet fails", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: false,
+      status: 403,
+      statusText: "Forbidden",
+    } as Response);
+
+    await expect(
+      fetchTabs("sheet-id", "api-key", ["Standings", "Week 1"]),
+    ).rejects.toThrow(
+      'Sheets API error for tabs "Standings", "Week 1": 403 Forbidden',
+    );
+  });
+});
+
+describe("fetchTab", () => {
+  it("uses the batch fetcher shape for one tab", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        valueRanges: [{ range: "Standings!A1:Z", values: [["row"]] }],
+      }),
+    } as Response);
+
+    await expect(fetchTab("sheet-id", "api-key", "Standings")).resolves.toEqual(
+      [["row"]],
+    );
   });
 });

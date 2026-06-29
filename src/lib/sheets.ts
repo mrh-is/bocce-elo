@@ -29,20 +29,53 @@ const MATCHUP_COLS = {
   RIGHT_B: 9,
 } as const;
 
+export type RowsByTab = Record<string, string[][]>;
+
+interface BatchGetResponse {
+  valueRanges?: { values?: string[][] }[];
+}
+
+export async function fetchTabs(
+  sheetId: string,
+  apiKey: string,
+  tabNames: string[],
+): Promise<RowsByTab> {
+  const uniqueTabNames = [...new Set(tabNames)];
+  if (uniqueTabNames.length === 0) {
+    return {};
+  }
+
+  const params = new URLSearchParams({ key: apiKey });
+  for (const tabName of uniqueTabNames) {
+    params.append("ranges", tabName);
+  }
+
+  const url = `${SHEETS_BASE}/${sheetId}/values:batchGet?${params}`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(
+      `Sheets API error for tabs ${uniqueTabNames.map((tab) => `"${tab}"`).join(", ")}: ${res.status} ${res.statusText}`,
+    );
+  }
+
+  const data = (await res.json()) as BatchGetResponse;
+  const valueRanges = data.valueRanges ?? [];
+
+  return Object.fromEntries(
+    uniqueTabNames.map((tabName, index) => [
+      tabName,
+      valueRanges[index]?.values ?? [],
+    ]),
+  );
+}
+
 export async function fetchTab(
   sheetId: string,
   apiKey: string,
   tabName: string,
 ): Promise<string[][]> {
-  const url = `${SHEETS_BASE}/${sheetId}/values/${encodeURIComponent(tabName)}?key=${apiKey}`;
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(
-      `Sheets API error for tab "${tabName}": ${res.status} ${res.statusText}`,
-    );
-  }
-  const data = (await res.json()) as { values?: string[][] };
-  return data.values ?? [];
+  const rowsByTab = await fetchTabs(sheetId, apiKey, [tabName]);
+  return rowsByTab[tabName] ?? [];
 }
 
 export function parseMatch(row: string[], colOffset: number): Match | null {
