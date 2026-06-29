@@ -32,23 +32,30 @@ export async function load(): Promise<PageData> {
     return cached;
   }
 
-  const rowsByTab = await fetchTabs(
-    PUBLIC_SHEET_ID,
-    PUBLIC_GOOGLE_API_KEY,
-    requiredTabs(),
-  );
+  try {
+    const rowsByTab = await fetchTabs(
+      PUBLIC_SHEET_ID,
+      PUBLIC_GOOGLE_API_KEY,
+      requiredTabs(),
+    );
 
-  cached = buildLeaguePageData(rowsByTab, {
-    weekTabs: WEEK_TABS,
-    upcomingTab: UPCOMING_TAB,
-    summaryTab: SUMMARY_TAB,
-    rankingsNameCol: RANKINGS_NAME_COL,
-    rankingsRankCol: RANKINGS_RANK_COL,
-    seasonLabel: SEASON_LABEL,
-    sheetUrl: SHEET_URL,
-    myTeam: MY_TEAM,
-  });
-  cachedAt = Date.now();
+    cached = buildLeaguePageData(rowsByTab, {
+      weekTabs: WEEK_TABS,
+      upcomingTab: UPCOMING_TAB,
+      summaryTab: SUMMARY_TAB,
+      rankingsNameCol: RANKINGS_NAME_COL,
+      rankingsRankCol: RANKINGS_RANK_COL,
+      seasonLabel: SEASON_LABEL,
+      sheetUrl: SHEET_URL,
+      myTeam: MY_TEAM,
+    });
+    cachedAt = Date.now();
+  } catch (err) {
+    console.error("Failed to load league data:", err);
+    if (!cached) {
+      throw err;
+    }
+  }
 
-  return cached;
+  return cached!;
 }
