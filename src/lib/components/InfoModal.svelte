@@ -148,7 +148,7 @@
     font-variation-settings: "opsz" 40;
     font-weight: 900;
     font-size: 1.4rem;
-    color: var(--header-bg);
+    color: var(--text);
     margin: 0 0 1rem;
     line-height: 1.1;
   }
