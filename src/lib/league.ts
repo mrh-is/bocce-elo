@@ -148,9 +148,14 @@ function buildLeaderboard(
   const eloSorted = Object.keys(ratings).sort(
     (a, b) => ratings[b] - ratings[a],
   );
-  const eloRankByName = Object.fromEntries(
-    eloSorted.map((name, i) => [name, i + 1]),
-  );
+  const eloRankByName: Record<string, number> = {};
+  let currentRank = 1;
+  for (let i = 0; i < eloSorted.length; i++) {
+    if (i > 0 && ratings[eloSorted[i]] < ratings[eloSorted[i - 1]]) {
+      currentRank = i + 1;
+    }
+    eloRankByName[eloSorted[i]] = currentRank;
+  }
 
   return eloSorted
     .map((name) => {
