@@ -10,9 +10,9 @@
     "test": "vitest",
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write .",
-    "precommit": "npm run format && npm run lint",
+    "precommit": "pnpm run format && pnpm run lint",
     "prepare": "git config core.hooksPath .githooks",
-    "deploy": "npm run build && wrangler pages deploy .svelte-kit/cloudflare --project-name bocce-elo"
+    "deploy": "pnpm run build && wrangler pages deploy .svelte-kit/cloudflare --project-name bocce-elo"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

@@ -5,15 +5,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-npm run dev        # local dev server
-npm run build      # production build
-npm run test       # run all tests (vitest)
-npm run lint       # prettier + eslint check
-npm run format     # auto-format
-npm run deploy     # build + deploy to Cloudflare Pages
+pnpm run dev        # local dev server
+pnpm run build      # production build
+pnpm run test       # run all tests (vitest)
+pnpm run lint       # prettier + eslint check
+pnpm run format     # auto-format
+pnpm run deploy     # build + deploy to Cloudflare Pages
 ```
 
-Run a single test file: `npx vitest run src/tests/elo.test.ts`
+Run a single test file: `pnpm exec vitest run src/tests/elo.test.ts`
 
 ## Architecture
 
@@ -41,7 +41,7 @@ SvelteKit app deployed to Cloudflare Pages (`@sveltejs/adapter-cloudflare`). The
 
 ```
 PUBLIC_GOOGLE_API_KEY=...
-PUBLIC_SHEET_ID=1vhfcIsIHrt4-U11LdutPz5hfxfjdBhEPFaLXMZz0KRs
+PUBLIC_SHEET_ID=1Vb_iXA83NK33Jvl5lSr9jNoQTelFlIhBnac5KjjkiDI
 ```
 
 Both are `PUBLIC_` so they're embedded in the client bundle (the Sheet is publicly readable).
@@ -57,9 +57,9 @@ Specs and implementation plans live in `docs/superpowers/plans/`. Commit them al
 ## Deployment
 
 ```bash
-npm run deploy
+pnpm run deploy
 # or equivalently:
-npm run build && wrangler pages deploy .svelte-kit/cloudflare --project-name bocce-elo
+pnpm run build && wrangler pages deploy .svelte-kit/cloudflare --project-name bocce-elo
 ```
 
 Deployed at `bocce-elo.pages.dev` / `bocce.mrh.is`.

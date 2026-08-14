@@ -97,19 +97,15 @@ function resolveUpcomingMatchups(
     );
   }
 
-  // Auto-detect: walk backward through weeks and return the first week that has
-  // matchup rows with both team names present but blank scores (i.e. not yet played).
-  // Assumes weeks are uploaded to the sheet before scores are entered — a partially
-  // played week (some scores filled in, some blank) will still appear here but its
-  // already-played games will be silently omitted. Set UPCOMING_TAB explicitly in
-  // config.ts to avoid this ambiguity once a season is underway.
-  for (let i = weekRowsCache.length - 1; i >= 0; i--) {
-    const matchups = toUpcomingMatchups(
-      weekRowsCache[i],
-      ratings,
-      canonicalNames,
-    );
-    if (matchups.length > 0) {
+  // Auto-detect: walk forward through weeks and return the first week that has
+  // unplayed matchups (team names present but scores blank).
+  for (const rows of weekRowsCache) {
+    const matchups = toUpcomingMatchups(rows, ratings, canonicalNames);
+    if (matchups.length === 0) {
+      continue;
+    }
+    const played = parseMatchTab(rows).length;
+    if (matchups.length > played) {
       return matchups;
     }
   }

@@ -3,84 +3,77 @@ import { normalize, canonicalize } from "../lib/names.js";
 
 describe("normalize", () => {
   it("lowercases and strips punctuation", () => {
-    expect(normalize("L&O: SHU")).toBe("lo shu");
+    expect(normalize("Walter & the Bocce Bunch")).toBe(
+      "walter the bocce bunch",
+    );
   });
   it("trims whitespace", () => {
     expect(normalize("  Boccegenius  ")).toBe("boccegenius");
   });
   it("preserves digits", () => {
-    expect(normalize("Balls5Eva")).toBe("balls5eva");
+    expect(normalize("Matchballz 20")).toBe("matchballz 20");
   });
 });
 
 describe("canonicalize", () => {
   const canonical = [
-    "1 Ball, 2 Balls, Red Balls, Blue Balls",
-    "Balltime High",
-    "Ballz5Eva",
-    "Bocce-lism",
-    "Bocce-r? I barely know her!",
+    "Bachelor's Degree in Bocce",
+    "Bangin' and Bumpin'",
+    "Bocce Snatchers",
     "Deep Throwed It",
+    "Florals? For Bocce?",
     "Gay De-Bocce-ry",
-    "I Wanna Dance With Some Bocce",
-    "InGaysion of the Bocce Snatchers",
+    "Goose Shits and Giggles",
+    "I Wanna Dance with Somebocce",
     "Irritable Bocce Syndrome",
+    "It's Bocce, Bitch",
     "Itty Bitty Bocce Committee",
-    "Lawn Order: Special Homo Unit",
-    "Lawn and Order: Pallina Intent",
-    "Love is a Bocce Field",
-    "Resting Bocce Faces",
-    "Slobberknockin on Ediballs",
+    "Orange is the New Bocce",
+    "Professional Ball Handlers",
+    "Rolling with my Homos",
+    "She Doesn't Even Throw Here",
     "Son of a Be-occe",
     "Teeny Weenie Pallinis",
-    "The House Of Bocce",
-    "Throws of Despair",
-    "Walter and the Bocce Bunch",
+    "Thankful Grateful Blessed",
+    "Walter & the Bocce Bunch",
     "boccegenius",
   ];
 
   it("resolves known aliases", () => {
     // Truncations
-    expect(canonicalize("Ingaysion of the Bocce", canonical)).toBe(
-      "InGaysion of the Bocce Snatchers",
-    );
-    expect(canonicalize("Slobberknockin'", canonical)).toBe(
-      "Slobberknockin on Ediballs",
-    );
     expect(canonicalize("Teeny Weenie", canonical)).toBe(
       "Teeny Weenie Pallinis",
     );
-    // L&O variants (L&O: SHU → normalize → 'lo shu')
-    expect(canonicalize("L&O: SHU", canonical)).toBe(
-      "Lawn Order: Special Homo Unit",
+    expect(canonicalize("Itty Bitty Bocce", canonical)).toBe(
+      "Itty Bitty Bocce Committee",
     );
-    expect(canonicalize("L & O: Special Homo Unit", canonical)).toBe(
-      "Lawn Order: Special Homo Unit",
+    expect(canonicalize("She Doesnt Even", canonical)).toBe(
+      "She Doesn't Even Throw Here",
     );
-    expect(canonicalize("L&O: PI", canonical)).toBe(
-      "Lawn and Order: Pallina Intent",
+    expect(canonicalize("I Wanna Dance W", canonical)).toBe(
+      "I Wanna Dance with Somebocce",
     );
-    expect(canonicalize("L & O: Pallina Intent", canonical)).toBe(
-      "Lawn and Order: Pallina Intent",
+    expect(canonicalize("Walter and the Bocce", canonical)).toBe(
+      "Walter & the Bocce Bunch",
     );
     // Typos
-    expect(canonicalize("Balls5Eva", canonical)).toBe("Ballz5Eva");
     expect(canonicalize("Deeped Throwed It", canonical)).toBe(
       "Deep Throwed It",
     );
     expect(canonicalize("Irratable Bocce Syndrome", canonical)).toBe(
       "Irritable Bocce Syndrome",
     );
-    expect(canonicalize("Ball Time High", canonical)).toBe("Balltime High");
+    expect(canonicalize("Son of Beocce", canonical)).toBe("Son of a Be-occe");
   });
 
   it("resolves via normalize() alone (no explicit alias needed)", () => {
-    // These normalize to the same string as the canonical name
-    expect(canonicalize("Boccelism", canonical)).toBe("Bocce-lism"); // both → 'boccelism'
-    expect(canonicalize("Gay Deboccery", canonical)).toBe("Gay De-Bocce-ry"); // both → 'gay deboccery'
-    expect(canonicalize("The House of Bocce", canonical)).toBe(
-      "The House Of Bocce",
-    ); // both → 'the house of bocce'
+    expect(canonicalize("Gay Deboccery", canonical)).toBe("Gay De-Bocce-ry");
+    expect(canonicalize("Florals For Bocce", canonical)).toBe(
+      "Florals? For Bocce?",
+    );
+    expect(canonicalize("Its Bocce Bitch", canonical)).toBe(
+      "It's Bocce, Bitch",
+    );
   });
 
   it("matches exact canonical name case-insensitively", () => {
