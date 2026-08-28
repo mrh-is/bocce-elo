@@ -81,6 +81,29 @@ describe("canonicalize", () => {
     expect(canonicalize("BOCCEGENIUS", canonical)).toBe("boccegenius");
   });
 
+  it("resolves truncated names via prefix matching", () => {
+    expect(canonicalize("Itty Bitty Bocce Co", canonical)).toBe(
+      "Itty Bitty Bocce Committee",
+    );
+    expect(canonicalize("Professional Ball H", canonical)).toBe(
+      "Professional Ball Handlers",
+    );
+    expect(canonicalize("Thankful Grateful B", canonical)).toBe(
+      "Thankful Grateful Blessed",
+    );
+  });
+
+  it("does not prefix-match when input is too short", () => {
+    const result = canonicalize("Bocce", canonical);
+    expect(result).toBe("Bocce");
+  });
+
+  it("does not prefix-match when multiple canonical names match", () => {
+    const ambiguous = [...canonical, "Itty Bitty Bocce Crew"];
+    const result = canonicalize("Itty Bitty Bocce C", ambiguous);
+    expect(result).toBe("Itty Bitty Bocce C");
+  });
+
   it("returns name as-is when not found (and logs warning)", () => {
     const result = canonicalize("Unknown Team", canonical);
     expect(result).toBe("Unknown Team");

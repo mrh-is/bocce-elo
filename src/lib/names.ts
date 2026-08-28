@@ -63,6 +63,17 @@ export function canonicalize(name: string, canonicalNames: string[]): string {
     }
   }
 
+  // Prefix match: handles arbitrary truncations from narrow sheet columns.
+  // Requires 8+ normalized chars and a unique match to avoid false positives.
+  if (n.length >= 8) {
+    const prefixMatches = canonicalNames.filter((c) =>
+      normalize(c).startsWith(n),
+    );
+    if (prefixMatches.length === 1) {
+      return prefixMatches[0];
+    }
+  }
+
   // eslint-disable-next-line no-console
   console.warn(`[names] Unknown team name: "${name}"`);
   return name;
