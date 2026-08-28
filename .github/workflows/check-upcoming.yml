@@ -1,0 +1,22 @@
+name: Check upcoming name mismatches
+
+on:
+  schedule:
+    - cron: "0 18 * * 3" # Wednesdays at 6pm UTC (2pm ET), before game night
+  workflow_dispatch: # manual trigger
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: npx tsx scripts/check-upcoming.ts
+        env:
+          PUBLIC_GOOGLE_API_KEY: ${{ secrets.PUBLIC_GOOGLE_API_KEY }}
+          PUBLIC_SHEET_ID: ${{ vars.PUBLIC_SHEET_ID || '1Vb_iXA83NK33Jvl5lSr9jNoQTelFlIhBnac5KjjkiDI' }}

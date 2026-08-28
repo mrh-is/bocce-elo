@@ -70,6 +70,12 @@ export default [
     },
   },
   {
+    files: ["scripts/**/*"],
+    rules: {
+      "no-console": "off",
+    },
+  },
+  {
     files: ["**/*.test.{js,ts}", "**/*.spec.{js,ts}", "**/tests/**/*"],
     rules: {
       "no-console": "off",

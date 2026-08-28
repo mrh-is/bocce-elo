@@ -5,12 +5,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-pnpm run dev        # local dev server
-pnpm run build      # production build
-pnpm run test       # run all tests (vitest)
-pnpm run lint       # prettier + eslint check
-pnpm run format     # auto-format
-pnpm run deploy     # build + deploy to Cloudflare Pages
+pnpm run dev            # local dev server
+pnpm run build          # production build
+pnpm run test           # run all tests (vitest)
+pnpm run lint           # prettier + eslint check
+pnpm run format         # auto-format
+pnpm run deploy         # build + deploy to Cloudflare Pages
+pnpm run check:upcoming # verify all teams have upcoming game data (needs .env)
 ```
 
 Run a single test file: `pnpm exec vitest run src/tests/elo.test.ts`
