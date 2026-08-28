@@ -12,7 +12,8 @@
     "format": "prettier --write .",
     "precommit": "pnpm run format && pnpm run lint",
     "prepare": "git config core.hooksPath .githooks",
-    "deploy": "pnpm run build && wrangler pages deploy .svelte-kit/cloudflare --project-name bocce-elo"
+    "deploy": "pnpm run build && wrangler pages deploy .svelte-kit/cloudflare --project-name bocce-elo",
+    "check:upcoming": "tsx scripts/check-upcoming.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -27,6 +28,7 @@
     "prettier": "^3.9.6",
     "prettier-plugin-svelte": "^4.1.1",
     "svelte": "^5.56.9",
+    "tsx": "^4.23.12",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.67.0",
     "vite": "^8.2.1",

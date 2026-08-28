@@ -2,9 +2,17 @@ import { describe, it, expect } from "vitest";
 import { normalize, canonicalize } from "../lib/names.js";
 
 describe("normalize", () => {
-  it("lowercases and strips punctuation", () => {
+  it("lowercases, converts & to 'and', and strips punctuation", () => {
     expect(normalize("Walter & the Bocce Bunch")).toBe(
-      "walter the bocce bunch",
+      "walter and the bocce bunch",
+    );
+  });
+  it("treats & identically to 'and'", () => {
+    expect(normalize("Goose Shits & Giggles")).toBe(
+      normalize("Goose Shits and Giggles"),
+    );
+    expect(normalize("Bangin' & Bumpin'")).toBe(
+      normalize("Bangin' and Bumpin'"),
     );
   });
   it("trims whitespace", () => {
@@ -18,6 +26,7 @@ describe("normalize", () => {
 describe("canonicalize", () => {
   const canonical = [
     "Bachelor's Degree in Bocce",
+    "Balls Not Included",
     "Bangin' and Bumpin'",
     "Bocce Snatchers",
     "Deep Throwed It",
@@ -64,6 +73,22 @@ describe("canonicalize", () => {
       "Irritable Bocce Syndrome",
     );
     expect(canonicalize("Son of Beocce", canonical)).toBe("Son of a Be-occe");
+    // Alternate spellings from week tabs
+    expect(canonicalize("I Wanna Dance w/Some Bocce", canonical)).toBe(
+      "I Wanna Dance with Somebocce",
+    );
+    expect(canonicalize("I Wanna Dance With Some Bocce", canonical)).toBe(
+      "I Wanna Dance with Somebocce",
+    );
+  });
+
+  it("resolves & vs 'and' mismatches via normalize()", () => {
+    expect(canonicalize("Goose Shits & Giggles", canonical)).toBe(
+      "Goose Shits and Giggles",
+    );
+    expect(canonicalize("Bangin' & Bumpin'", canonical)).toBe(
+      "Bangin' and Bumpin'",
+    );
   });
 
   it("resolves via normalize() alone (no explicit alias needed)", () => {
@@ -79,6 +104,29 @@ describe("canonicalize", () => {
   it("matches exact canonical name case-insensitively", () => {
     expect(canonicalize("boccegenius", canonical)).toBe("boccegenius");
     expect(canonicalize("BOCCEGENIUS", canonical)).toBe("boccegenius");
+  });
+
+  it("resolves truncated names via prefix matching", () => {
+    expect(canonicalize("Itty Bitty Bocce Co", canonical)).toBe(
+      "Itty Bitty Bocce Committee",
+    );
+    expect(canonicalize("Professional Ball H", canonical)).toBe(
+      "Professional Ball Handlers",
+    );
+    expect(canonicalize("Thankful Grateful B", canonical)).toBe(
+      "Thankful Grateful Blessed",
+    );
+  });
+
+  it("does not prefix-match when input is too short", () => {
+    const result = canonicalize("Bocce", canonical);
+    expect(result).toBe("Bocce");
+  });
+
+  it("does not prefix-match when multiple canonical names match", () => {
+    const ambiguous = [...canonical, "Itty Bitty Bocce Crew"];
+    const result = canonicalize("Itty Bitty Bocce C", ambiguous);
+    expect(result).toBe("Itty Bitty Bocce C");
   });
 
   it("returns name as-is when not found (and logs warning)", () => {

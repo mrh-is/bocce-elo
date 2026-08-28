@@ -5,7 +5,12 @@
   const {
     team,
     hasUpcoming,
-  }: { team: LeaderboardEntry; hasUpcoming: boolean } = $props();
+    isMyTeam = false,
+  }: {
+    team: LeaderboardEntry;
+    hasUpcoming: boolean;
+    isMyTeam?: boolean;
+  } = $props();
 
   function rankDiffClass(diff: number | null): string {
     if (diff === null || diff === 0) {
@@ -26,7 +31,7 @@
   const medals: Record<number, string> = { 1: "🥇", 2: "🥈", 3: "🥉" };
 </script>
 
-<tr class:my-team={team.isMyTeam}>
+<tr class:my-team={isMyTeam}>
   <td class="num official">
     {#if medals[team.officialRank ?? -1]}
       <span class="medal">{medals[team.officialRank ?? -1]}</span>
@@ -34,25 +39,25 @@
       {team.officialRank ?? "–"}
     {/if}
   </td>
+  <td class="name">
+    {#if isMyTeam}<span class="dog">🐕</span>{/if}
+    {team.name}
+  </td>
+  {#if hasUpcoming}
+    <td class="this-wk">
+      <UpcomingGames games={team.upcoming} />
+    </td>
+  {/if}
+  <td class="num elo">{team.elo}</td>
   <td
     class="num rank {rankDiffClass(team.rankDiff)}"
     title={hoverText(team.rankDiff)}
   >
     {team.rank}
   </td>
-  <td class="name">
-    {#if team.isMyTeam}<span class="dog">🐕</span>{/if}
-    {team.name}
-  </td>
-  <td class="num elo">{team.elo}</td>
   <td class="num wins">{team.wins}</td>
   <td class="num losses">{team.losses}</td>
   <td class="num ties">{team.ties || "–"}</td>
-  {#if hasUpcoming}
-    <td class="this-wk">
-      <UpcomingGames games={team.upcoming} />
-    </td>
-  {/if}
 </tr>
 
 <style>
