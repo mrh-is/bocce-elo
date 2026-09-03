@@ -1,6 +1,6 @@
-import { PUBLIC_GOOGLE_API_KEY, PUBLIC_SHEET_ID } from "$env/static/public";
-import { buildLeaguePageData } from "$lib/league.js";
-import { fetchTabs } from "$lib/sheets.js";
+import { PUBLIC_GOOGLE_API_KEY, PUBLIC_SHEET_ID } from "$app/env/public";
+import { buildLeaguePageData } from "#lib/league.js";
+import { fetchTabs } from "#lib/sheets.js";
 import {
   WEEK_TABS,
   UPCOMING_TAB,
@@ -10,8 +10,8 @@ import {
   SEASON_LABEL,
   SHEET_URL,
   MY_TEAM,
-} from "$lib/config.js";
-import type { PageData } from "$lib/types.js";
+} from "#lib/config.js";
+import type { PageData } from "#lib/types.js";
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
 let cached: PageData | null = null;

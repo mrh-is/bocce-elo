@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { browser } from "$app/environment";
+  import { browser } from "$app/env";
   import type { PageData } from "./$types.js";
-  import PageHeader from "$lib/components/PageHeader.svelte";
-  import SearchBar from "$lib/components/SearchBar.svelte";
-  import TeamPicker from "$lib/components/TeamPicker.svelte";
-  import LeaderboardTable from "$lib/components/LeaderboardTable.svelte";
+  import PageHeader from "#lib/components/PageHeader.svelte";
+  import SearchBar from "#lib/components/SearchBar.svelte";
+  import TeamPicker from "#lib/components/TeamPicker.svelte";
+  import LeaderboardTable from "#lib/components/LeaderboardTable.svelte";
   const { data }: { data: PageData } = $props();
 
   let search = $state("");

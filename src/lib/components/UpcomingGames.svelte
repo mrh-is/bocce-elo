@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { UpcomingGame } from "$lib/types.js";
+  import type { UpcomingGame } from "#lib/types.js";
   import GameLine from "./GameLine.svelte";
 
   const { games }: { games: UpcomingGame[] } = $props();
