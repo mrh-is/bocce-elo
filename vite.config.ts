@@ -8,6 +8,9 @@ export default defineConfig({
     sveltekit({
       adapter: adapter(),
       preprocess: vitePreprocess(),
+      experimental: {
+        remoteFunctions: true,
+      },
     }),
   ],
   test: {

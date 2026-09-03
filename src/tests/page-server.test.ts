@@ -54,6 +54,35 @@ describe("page server load caching", () => {
     expect(first.leaderboard).toEqual(second.leaderboard);
   });
 
+  it("reuses cached data within the cache lifetime", async () => {
+    fetchTabsMock.mockResolvedValue(rowsByTab);
+    const { load } = await import("../routes/+page.server.js");
+
+    const first = await load();
+    const second = await load();
+
+    expect(fetchTabsMock).toHaveBeenCalledTimes(1);
+    expect(second).toBe(first);
+  });
+
+  it("returns updated data after the cache expires", async () => {
+    const updatedRows = {
+      ...rowsByTab,
+      "Week 1": [["", "1", "Alpha", "8", "Beta", "21"]],
+    };
+    fetchTabsMock
+      .mockResolvedValueOnce(rowsByTab)
+      .mockResolvedValueOnce(updatedRows);
+    const { load, __testing } = await import("../routes/+page.server.js");
+
+    const first = await load();
+    __testing.expireCache();
+    const second = await load();
+
+    expect(fetchTabsMock).toHaveBeenCalledTimes(2);
+    expect(second.leaderboard).not.toEqual(first.leaderboard);
+  });
+
   it("returns stale cached data when refresh fails", async () => {
     fetchTabsMock.mockResolvedValueOnce(rowsByTab);
     const { load, __testing } = await import("../routes/+page.server.js");
@@ -63,5 +92,12 @@ describe("page server load caching", () => {
     fetchTabsMock.mockRejectedValueOnce(new Error("network down"));
 
     await expect(load()).resolves.toEqual(first);
+  });
+
+  it("surfaces a failure when no cached data exists", async () => {
+    fetchTabsMock.mockRejectedValueOnce(new Error("network down"));
+    const { load } = await import("../routes/+page.server.js");
+
+    await expect(load()).rejects.toThrow("network down");
   });
 });

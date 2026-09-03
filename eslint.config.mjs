@@ -64,7 +64,11 @@ export default [
     },
   },
   {
-    files: ["**/*.server.{js,ts}", "**/+layout.server.{js,ts}"],
+    files: [
+      "**/*.server.{js,ts}",
+      "**/+layout.server.{js,ts}",
+      "src/lib/server/**/*",
+    ],
     rules: {
       "no-console": "off",
     },
