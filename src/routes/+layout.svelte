@@ -1,6 +1,6 @@
 <script lang="ts">
   import "../app.css";
-  import BocceBackground from "$lib/components/BocceBackground.svelte";
+  import BocceBackground from "#lib/components/BocceBackground.svelte";
   const { children } = $props();
 </script>
 

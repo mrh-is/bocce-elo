@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { LeaderboardEntry } from "$lib/types.js";
+  import type { LeaderboardEntry } from "#lib/types.js";
   import UpcomingGames from "./UpcomingGames.svelte";
 
   const {

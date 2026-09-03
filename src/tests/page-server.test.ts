@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("$env/static/public", () => ({
+vi.mock("$app/env/public", () => ({
   PUBLIC_GOOGLE_API_KEY: "api-key",
   PUBLIC_SHEET_ID: "sheet-id",
 }));
 
-vi.mock("$lib/config.js", () => ({
+vi.mock("#lib/config.js", () => ({
   WEEK_TABS: ["Week 1"],
   UPCOMING_TAB: "Week 2",
   SUMMARY_TAB: "Standings",
@@ -18,7 +18,7 @@ vi.mock("$lib/config.js", () => ({
 
 const fetchTabsMock = vi.hoisted(() => vi.fn());
 
-vi.mock("$lib/sheets.js", async () => {
+vi.mock("#lib/sheets.js", async () => {
   const actual = await vi.importActual<typeof import("../lib/sheets.js")>( // eslint-disable-line @typescript-eslint/consistent-type-imports
     "../lib/sheets.js",
   );

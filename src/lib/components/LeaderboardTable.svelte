@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { LeaderboardEntry } from "$lib/types.js";
+  import type { LeaderboardEntry } from "#lib/types.js";
   import TeamRow from "./TeamRow.svelte";
 
   const {
