@@ -40,11 +40,13 @@ export const ALIASES: Record<string, string> = {
   // Possible typos/misspellings
   "bangin and bumpin": "Bangin' and Bumpin'",
   "balls note included": "Balls Not Included",
+  boccelicisms: "Boccelisms",
   "deeped throwed it": "Deep Throwed It",
   "gay beboccery": "Gay De-Bocce-ry",
   "gay deboccery": "Gay De-Bocce-ry",
   "gay debocce ry": "Gay De-Bocce-ry",
   "irratable bocce syndrome": "Irritable Bocce Syndrome",
+  "pallina snipers": "The Pallina Snipers",
   "son of beocce": "Son of a Be-occe",
   "teeny weenies pallinis": "Teeny Weenie Pallinis",
 };

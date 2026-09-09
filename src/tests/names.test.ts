@@ -28,6 +28,7 @@ describe("canonicalize", () => {
     "Bachelor's Degree in Bocce",
     "Balls Not Included",
     "Bangin' and Bumpin'",
+    "Boccelisms",
     "Bocce Snatchers",
     "Deep Throwed It",
     "Florals? For Bocce?",
@@ -44,6 +45,7 @@ describe("canonicalize", () => {
     "Son of a Be-occe",
     "Teeny Weenie Pallinis",
     "Thankful Grateful Blessed",
+    "The Pallina Snipers",
     "Walter & the Bocce Bunch",
     "boccegenius",
   ];
@@ -73,6 +75,10 @@ describe("canonicalize", () => {
       "Irritable Bocce Syndrome",
     );
     expect(canonicalize("Son of Beocce", canonical)).toBe("Son of a Be-occe");
+    expect(canonicalize("Boccelicisms", canonical)).toBe("Boccelisms");
+    expect(canonicalize("Pallina Snipers", canonical)).toBe(
+      "The Pallina Snipers",
+    );
     // Alternate spellings from week tabs
     expect(canonicalize("I Wanna Dance w/Some Bocce", canonical)).toBe(
       "I Wanna Dance with Somebocce",
