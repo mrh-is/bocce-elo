@@ -10,6 +10,7 @@ export const ALIASES: Record<string, string> = {
   "i wanna dance": "I Wanna Dance with Somebocce",
   "i wanna dance w": "I Wanna Dance with Somebocce",
   "i wanna dance with": "I Wanna Dance with Somebocce",
+  "i wanna dance wsomebocce": "I Wanna Dance with Somebocce",
   "i wanna dance wsome bocce": "I Wanna Dance with Somebocce",
   "i wanna dance with some bocce": "I Wanna Dance with Somebocce",
   "i wanna dance with somebocce": "I Wanna Dance with Somebocce",
@@ -22,6 +23,7 @@ export const ALIASES: Record<string, string> = {
   "professional ball": "Professional Ball Handlers",
   "professional ball handlers": "Professional Ball Handlers",
   "rolling with my": "Rolling with my Homos",
+  "rolling w my homos": "Rolling with my Homos",
   "rolling with my homos": "Rolling with my Homos",
   "senorita busting": "Senorita Busting Balls",
   "senorita busting balls": "Senorita Busting Balls",
@@ -39,6 +41,8 @@ export const ALIASES: Record<string, string> = {
 
   // Possible typos/misspellings
   "bangin and bumpin": "Bangin' and Bumpin'",
+  boecchii: "Boechii",
+  rupaullina: "RuPallina",
   "balls note included": "Balls Not Included",
   boccelicisms: "Boccelisms",
   "deeped throwed it": "Deep Throwed It",

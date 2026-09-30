@@ -139,4 +139,15 @@ describe("canonicalize", () => {
     const result = canonicalize("Unknown Team", canonical);
     expect(result).toBe("Unknown Team");
   });
+
+  it("resolves sheet variants seen in week tabs", () => {
+    expect(canonicalize("I Wanna Dance w/Somebocce", canonical)).toBe(
+      "I Wanna Dance with Somebocce",
+    );
+    expect(canonicalize("Rolling w/ my Homos", canonical)).toBe(
+      "Rolling with my Homos",
+    );
+    expect(canonicalize("Boecchii", canonical)).toBe("Boechii");
+    expect(canonicalize("RuPaullina", canonical)).toBe("RuPallina");
+  });
 });
