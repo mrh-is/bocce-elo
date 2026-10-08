@@ -46,6 +46,7 @@ export const ALIASES: Record<string, string> = {
   "balls note included": "Balls Not Included",
   boccelicisms: "Boccelisms",
   "deeped throwed it": "Deep Throwed It",
+  fuhgeddabocce: "Fughaddabocce",
   "gay beboccery": "Gay De-Bocce-ry",
   "gay deboccery": "Gay De-Bocce-ry",
   "gay debocce ry": "Gay De-Bocce-ry",
